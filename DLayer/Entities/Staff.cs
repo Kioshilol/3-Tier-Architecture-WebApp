@@ -11,5 +11,6 @@ namespace DLayer.Entities
         string Name { get; set; }
         string ShortName { get; set; }
         string Postition { get; set; }
+        List<Task> TaskList { get; set; }
     }
 }

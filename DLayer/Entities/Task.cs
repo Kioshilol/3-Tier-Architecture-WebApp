@@ -11,5 +11,6 @@ namespace DLayer.Entities
         int TaskTime { get; set; }
         DateTime DateOfStart { get; set; }
         DateTime DateOfEnd { get; set; }
+        List<Staff> StaffList { get; set; }
     }
 }
