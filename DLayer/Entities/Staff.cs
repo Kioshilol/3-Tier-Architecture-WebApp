@@ -6,5 +6,10 @@ namespace DLayer.Entities
 {
     class Staff
     {
+        string Id { get; set; }
+        string Surname { get; set; }
+        string Name { get; set; }
+        string ShortName { get; set; }
+        string Postition { get; set; }
     }
 }
