@@ -11,5 +11,9 @@ namespace DLayer
         DbSet<Project> projects { get; set; }
         DbSet<Staff> Staff { get; set; }
         DbSet<Task> Tasks { get; set; }
+        public EFDBContext(DbContextOptions<EFDBContext> options) : base()
+        {
+
+        }
     }
 }
