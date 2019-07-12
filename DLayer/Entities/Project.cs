@@ -4,12 +4,19 @@ using System.Text;
 
 namespace DLayer.Entities
 {
-    class Project
+    public class Project
     {
+        public Project(string name, string shortName, string description)
+        {
+            Name = name;
+            ShortName = shortName;
+            Description = description;
+        }
+
         string Id { get; set; }
-        string Name { get; set; }
-        string ShortName { get; set; }
-        string Description { get; set; }
+        public string Name { get; set; }
+        public string ShortName { get; set; }
+        public string Description { get; set; }
         List<Task> TaskList { get; set; }
     }
 }

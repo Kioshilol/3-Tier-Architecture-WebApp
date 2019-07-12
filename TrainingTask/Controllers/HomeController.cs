@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using DLayer.Entities;
 using Microsoft.AspNetCore.Mvc;
 using TrainingTask.Models;
 
@@ -10,22 +11,19 @@ namespace TrainingTask.Controllers
 {
     public class HomeController : Controller
     {
+        private Project project;
         public IActionResult Index()
         {
             return View();
         }
 
-        public IActionResult About()
+        public IActionResult Task()
         {
-            ViewData["Message"] = "Your application description page.";
-
             return View();
         }
 
-        public IActionResult Contact()
+        public IActionResult Staff()
         {
-            ViewData["Message"] = "Your contact page.";
-
             return View();
         }
 

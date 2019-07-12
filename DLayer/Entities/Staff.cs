@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DLayer.Entities
 {
-    class Staff
+    public class Staff
     {
         string Id { get; set; }
         string Surname { get; set; }

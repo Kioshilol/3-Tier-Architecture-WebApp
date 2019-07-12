@@ -251,13 +251,15 @@ th {
   .label {
     border: 1px solid #000;
   }
-  .table {
-    border-collapse: collapse !important;
-  }
-  .table td,
-  .table th {
-    background-color: #fff !important;
-  }
+    .table {
+        border-collapse: collapse !important;
+        border: 1px solid black;
+    }
+        .table td,
+        .table th {
+            border: 1px solid black;
+            background-color: #fff !important;
+        }
   .table-bordered th,
   .table-bordered td {
     border: 1px solid #ddd !important;
@@ -2347,7 +2349,8 @@ pre code {
   }
 }
 table {
-  background-color: transparent;
+    border: 1px solid black;
+    background-color: transparent;
 }
 table col[class*="col-"] {
   position: static;
@@ -2370,9 +2373,10 @@ th {
   text-align: left;
 }
 .table {
-  width: 100%;
-  max-width: 100%;
-  margin-bottom: 20px;
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+    border: 1px solid black;
 }
 .table > thead > tr > th,
 .table > tbody > tr > th,
@@ -2400,9 +2404,10 @@ th {
 .table > tbody + tbody {
   border-top: 2px solid #ddd;
 }
-.table .table {
-  background-color: #fff;
-}
+    .table .table {
+        border: 1px solid black;
+        background-color: #fff;
+    }
 .table-condensed > thead > tr > th,
 .table-condensed > tbody > tr > th,
 .table-condensed > tfoot > tr > th,

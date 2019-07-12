@@ -7,6 +7,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using DLayer;
 
 namespace TrainingTask
 {
@@ -14,6 +15,7 @@ namespace TrainingTask
     {
         public static void Main(string[] args)
         {
+            //SampleData.Data(); //method of init some project data
             CreateWebHostBuilder(args).Build().Run();
         }
 
