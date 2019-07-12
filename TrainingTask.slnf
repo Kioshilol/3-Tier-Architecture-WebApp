@@ -1,0 +1,10 @@
+{
+  "solution": {
+    "path": "D:\\Training\\src\\TrainingTask\\TrainingTask.sln",
+    "projects": [
+      "..\\BLayer\\BLayer.csproj",
+      "..\\DLayer\\DLayer.csproj",
+      "TrainingTask.csproj"
+    ]
+  }
+}
