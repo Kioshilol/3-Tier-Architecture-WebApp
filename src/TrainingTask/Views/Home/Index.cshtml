@@ -1,0 +1,26 @@
+﻿@model  IEnumerable<DLayer.Entities.Project>
+@{
+    ViewData["Title"] = "Project";
+}
+<h2>@ViewData["Title"]</h2>
+
+<body>
+    <table class="table table-striped">
+        <tr>
+            <td>Id</td>
+            <td>Name</td>
+            <td>ShortName</td>
+            <td>Description</td>
+            <td>Create</td>
+            <td>Edit</td>
+            <td>Delete</td>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.ShortName</td>
+            </tr>
+        }
+    </table>
+</body>
