@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Data.Linq.Mapping;
 using System.Text;
 
-namespace DLayer.Entities
+namespace BLayer.DTO
 {
-    public class Task : IEntity
+    public class TaskDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public long TaskTime { get; set; }
         public DateTime DateOfStart { get; set; }
         public DateTime DateOfEnd { get; set; }
-        public  EnumTypeOfStatus TypeStatus { get; set; }
-
+        public EnumTypeOfStatus TypeStatus { get; set; }
         public enum EnumTypeOfStatus
         {
             [Display(Name = "Not Started")]

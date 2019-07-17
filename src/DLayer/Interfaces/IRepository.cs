@@ -6,13 +6,12 @@ using System.Text;
 
 namespace DLayer
 {
-    interface IRepository<T>
+    public interface IRepository<T>
     {
         void Insert(T entity);
-        void Delete(T entity);
-        //void Update(T entity);
-        IQueryable<T> SearchFor(Expression<Func<T, bool>> predicate);
-        IQueryable<T> GetAll();
+        void Delete(int id);
+        void Edit(T entity);
+        IEnumerable<T> GetAll();
         T GetById(int id);
     }
 }

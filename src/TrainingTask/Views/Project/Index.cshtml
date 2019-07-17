@@ -1,0 +1,32 @@
+﻿@model  IEnumerable<TrainingTask.Models.ProjectViewModel>
+@{
+    ViewData["Title"] = "Project";
+}
+<h2>@ViewData["Title"]</h2>
+
+<body>
+    <div class="form-group">
+        <a asp-action="CreateProject" class="btn btn-default">Create</a>
+    </div>
+        <table class="table table-striped">
+            <tr>
+                <td>Id</td>
+                <td>Name</td>
+                <td>ShortName</td>
+                <td>Description</td>
+                <td>Edit</td>
+                <td>Delete</td>
+            </tr>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td><a asp-action="ShowProject" asp-controller="Project" asp-route-id="@item.Id">@item.Name</a></td>
+                    <td>@item.ShortName</td>
+                    <td>@item.Description</td>
+                    <td><a asp-action="EditProject" asp-controller="Project" asp-route-id="@item.Id">Edit</a></td>
+                    <td><a asp-action="DeleteProject" asp-controller="Project" asp-route-id="@item.Id">Delete</a></td>
+                </tr>
+            }
+        </table>
+</body>

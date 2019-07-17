@@ -15,7 +15,6 @@ namespace TrainingTask
     {
         public static void Main(string[] args)
         {
-            //SampleData.Data(); //method of init some project data
             CreateWebHostBuilder(args).Build().Run();
         }
 

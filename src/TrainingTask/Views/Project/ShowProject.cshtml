@@ -1,0 +1,28 @@
+﻿@model TrainingTask.Models.ProjectViewModel
+
+@{
+    ViewData["Title"] = Model.Name + " Project";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+    <h2>@ViewData["Title"]</h2>
+
+    <form asp-action="ShowProject" asp-controller="ProjectController" asp-route-id="@Model.Id">
+        <table class="table table-striped">
+            <tr>
+                <td>Id</td>
+                <td>Name</td>
+                <td>ShortName</td>
+                <td>Description</td>
+            </tr>
+            <tr>
+                <td>@Model.Id</td>
+                <td>@Model.Name</td>
+                <td>@Model.ShortName</td>
+                <td>@Model.Description</td>
+            </tr>
+        </table>
+    </form>
+    <div>
+        <a asp-action="Index">Back to List</a>
+    </div>
+

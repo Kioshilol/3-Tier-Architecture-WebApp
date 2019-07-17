@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Linq.Mapping;
 using System.Text;
 
-namespace DLayer.Entities
+namespace BLayer.DTO
 {
-    public class Staff : IEntity
+    public class StaffDTO
     {
         public int Id { get; set; }
         public string Surname { get; set; }
         public string Name { get; set; }
         public string SecondName { get; set; }
         public string Position { get; set; }
-        public ICollection<Task> TaskList { get; set; }
     }
 }
