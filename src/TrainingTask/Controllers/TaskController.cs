@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using BLayer.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using TrainingTask.Mapper;
+using TrainingTask.Mapping;
 using TrainingTask.Models;
 
 namespace TrainingTask.Controllers
@@ -10,10 +12,14 @@ namespace TrainingTask.Controllers
     {
         private TaskService taskService;
         private TaskMapper taskMapper;
+        private ProjectMapper projectMapper;
+        private ProjectService projectService;
         public TaskController()
         {
             this.taskService = new TaskService();
             this.taskMapper = new TaskMapper();
+            this.projectService = new ProjectService();
+            this.projectMapper = new ProjectMapper();
         }
         public IActionResult Task()
         {
@@ -29,6 +35,14 @@ namespace TrainingTask.Controllers
 
         public IActionResult CreateTask()
         {
+            var projectsDTO = projectService.GetAll();
+            var projectsViewModel = new List<ProjectViewModel>();
+            foreach(var project in projectsDTO)
+            {
+                var projectViewModel = projectMapper.Map(project);
+                projectsViewModel.Add(projectViewModel);
+                ViewBag.Projects = projectsViewModel;
+            }
             return View();
         }
 
@@ -52,24 +66,24 @@ namespace TrainingTask.Controllers
         {
             var taskDTO = taskMapper.Map(task);
             taskService.Edit(taskDTO);
-            return RedirectToAction("Staff");
+            return RedirectToAction("Task");
         }
 
-        public IActionResult DeleteStaff(int id)
+        public IActionResult DeleteTask(int id)
         {
             var task = taskService.GetById(id);
             var taskViewModel = taskMapper.Map(task);
             return View(taskViewModel);
         }
 
-        [HttpPost, ActionName("DeleteStaff")]
+        [HttpPost, ActionName("DeleteTask")]
         public IActionResult DeleteConfirmed(int id)
         {
             taskService.Delete(id);
-            return RedirectToAction("Staff");
+            return RedirectToAction("Task");
         }
 
-        public IActionResult ShowStaff(int id)
+        public IActionResult ShowTask(int id)
         {
             var taskDTO = taskService.GetById(id);
             var taskModelView = taskMapper.Map(taskDTO);

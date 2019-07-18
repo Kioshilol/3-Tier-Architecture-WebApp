@@ -15,10 +15,12 @@ namespace BLayer.Services
     {
         IUnitOfWork DataBase { get; set; }
         private IBaseMapper<Project, ProjectDTO> projectMapper;
+        private IBaseMapper<Task, TaskDTO> taskMapper;
         public ProjectService()
         {
             this.DataBase = new UnitOfWork();
             this.projectMapper = new ProjectMapper();
+            this.taskMapper = new TaskMapper();
         }
 
         public ProjectDTO GetById(int id)
@@ -54,6 +56,18 @@ namespace BLayer.Services
         public void Delete(int id)
         {
             DataBase.Projects.Delete(id);
+        }
+
+        public IEnumerable<TaskDTO> GetTasksByProjectId(int id)
+        {
+            var tasksDTO = new List<TaskDTO>();
+            IEnumerable<Task> tasks = DataBase.TasksById.GettAllById(id);
+            foreach(var task in tasks)
+            {
+                var taskDTO = taskMapper.Map(task);
+                tasksDTO.Add(taskDTO);
+            }
+            return tasksDTO;
         }
     }
 }

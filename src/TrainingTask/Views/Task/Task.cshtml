@@ -24,11 +24,13 @@
         {
     <tr>
         <td>@item.Id</td>
-        <td>@item.Name</td>
+        <td><a asp-action="ShowTask" asp-controller="Task" asp-route-id="@item.Id">@item.Name</a></td>
         <td>@item.TaskTime</td>
         <td>@item.DateOfStart</td>
         <td>@item.DateOfEnd</td>
         <td>@item.TypeStatus</td>
+        <td><a asp-action="EditTask" asp-controller="Task" asp-route-id="@item.Id">Edit</a></td>
+        <td><a asp-action="DeleteTask" asp-controller="Task" asp-route-id="@item.Id">Delete</a></td>
     </tr>
         }
     </table>

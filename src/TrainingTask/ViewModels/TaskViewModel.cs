@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BLayer.DTO;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace TrainingTask.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public int ProjectId { get; set; }
         public long TaskTime { get; set; }
         public DateTime DateOfStart { get; set; }
         public DateTime DateOfEnd { get; set; }

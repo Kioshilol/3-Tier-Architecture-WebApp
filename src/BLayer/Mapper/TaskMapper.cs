@@ -17,7 +17,7 @@ namespace BLayer.Mapper
                 TaskTime = item.TaskTime,
                 DateOfStart = item.DateOfStart,
                 DateOfEnd = item.DateOfEnd,
-                TypeStatus = (Task.EnumTypeOfStatus)item.TypeStatus
+                TypeStatus = (Task.EnumTypeOfStatus)item.TypeStatus,
             };
         }
 

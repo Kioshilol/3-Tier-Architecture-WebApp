@@ -1,0 +1,31 @@
+﻿@model TrainingTask.Models.TaskViewModel
+
+@{
+    ViewData["Title"] = Model.Name + " Task";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="ShowTask" asp-controller="TaskController" asp-route-id="@Model.Id">
+    <table class="table table-striped">
+        <tr>
+            <td>Id</td>
+            <td>Name</td>
+            <td>Task Time</td>
+            <td>Date of start</td>
+            <td>Date of end</td>
+            <td>Status</td>
+        </tr>
+        <tr>
+            <td>@Model.Id</td>
+            <td>@Model.Name</td>
+            <td>@Model.TaskTime</td>
+            <td>@Model.DateOfStart</td>
+            <td>@Model.DateOfEnd</td>
+            <td>@Model.TypeStatus</td>
+        </tr>
+    </table>
+</form>
+<div>
+    <a asp-action="Task">Back to List</a>
+</div>

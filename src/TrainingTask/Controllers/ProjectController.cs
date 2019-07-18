@@ -3,6 +3,7 @@ using System.Diagnostics;
 using BLayer.DTO;
 using BLayer.Services;
 using Microsoft.AspNetCore.Mvc;
+using TrainingTask.Mapper;
 using TrainingTask.Mapping;
 using TrainingTask.Models;
 
@@ -11,11 +12,15 @@ namespace TrainingTask.Controllers
     public class ProjectController : Controller
     {
         private ProjectService projectService;
+        private ProjectService projectServiceForTasks;
         private ProjectMapper projectMapper;
+        private TaskMapper taskMapper;
         public ProjectController()
         {
             this.projectMapper = new ProjectMapper();
             this.projectService = new ProjectService();
+            this.taskMapper = new TaskMapper();
+            this.projectServiceForTasks = new ProjectService();
         }
 
         public IActionResult Index()
@@ -76,6 +81,13 @@ namespace TrainingTask.Controllers
         {
             var projectDTO = projectService.GetById(id);
             var projectModelView = projectMapper.Map(projectDTO);
+            var tasksDTO = projectServiceForTasks.GetTasksByProjectId(id);
+            projectModelView.tasks = new List<TaskViewModel>();
+            foreach(var task in tasksDTO)
+            {
+                var taskViewModel = taskMapper.Map(task);
+                projectModelView.tasks.Add(taskViewModel);
+            }
             return View(projectModelView);
         }
 
@@ -88,6 +100,17 @@ namespace TrainingTask.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public IActionResult CreateTaskIntoProject()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult CreateTaskIntoProject(TaskViewModel task)
+        {
+            return RedirectToAction("Index");
         }
     }
 }

@@ -13,6 +13,7 @@ namespace BLayer.DTO
         public DateTime DateOfStart { get; set; }
         public DateTime DateOfEnd { get; set; }
         public EnumTypeOfStatus TypeStatus { get; set; }
+        public ProjectDTO Project { get; set; }
         public enum EnumTypeOfStatus
         {
             [Display(Name = "Not Started")]

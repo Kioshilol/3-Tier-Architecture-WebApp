@@ -1,4 +1,5 @@
 ﻿using DLayer.Entities;
+using DLayer.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -7,7 +8,7 @@ using System.Text;
 
 namespace DLayer.Repositories
 {
-    public class TaskRep : IRepository<Task>
+    public class TaskRep : IRepository<Task>, IGetAllById<Task>
     {
         private SqlConnection _connection;
         public TaskRep(SqlConnection connection)
@@ -31,9 +32,9 @@ namespace DLayer.Repositories
             {
                 new SqlParameter("@TaskId", entity.Id),
                 new SqlParameter("@Name", entity.Name),
-                new SqlParameter("@Surname", entity.TaskTime),
-                new SqlParameter("@SecondName", entity.DateOfStart),
-                new SqlParameter("@Position", entity.DateOfEnd),
+                new SqlParameter("@TaskTime", entity.TaskTime),
+                new SqlParameter("@DateOfStart", entity.DateOfStart),
+                new SqlParameter("@DateOfEnd", entity.DateOfEnd),
                 new SqlParameter("@Status", entity.TypeStatus)
             };
             CommonMethods.CommonMethod(sp, parametersList, _connection);
@@ -56,7 +57,7 @@ namespace DLayer.Repositories
                     task.TaskTime = Convert.ToInt64(sqlDataReader["TaskTime"]);
                     task.DateOfStart = Convert.ToDateTime(sqlDataReader["DateOfStart"]);
                     task.DateOfEnd = Convert.ToDateTime(sqlDataReader["DateOfEnd"]);
-                    //Task.TypeStatus = sqlDataReader["TypeStatus"]; ?? how to convert to enum
+                    task.TypeStatus = (Task.EnumTypeOfStatus)Enum.Parse(typeof(Task.EnumTypeOfStatus), sqlDataReader["TypeStatus"].ToString());
                     taskList.Add(task);
                 }
                 SqlCon.Close();
@@ -81,6 +82,7 @@ namespace DLayer.Repositories
                     task.TaskTime = Convert.ToInt64(sqlDataReader["TaskTime"]);
                     task.DateOfStart = Convert.ToDateTime(sqlDataReader["DateOfStart"]);
                     task.DateOfEnd = Convert.ToDateTime(sqlDataReader["DateOfEnd"]);
+                    task.TypeStatus = (Task.EnumTypeOfStatus)Enum.Parse(typeof(Task.EnumTypeOfStatus), sqlDataReader["TypeStatus"].ToString());
                 }
                 SqlCon.Close();
             }
@@ -92,13 +94,40 @@ namespace DLayer.Repositories
             string sp = "spAddTask";
             List<SqlParameter> parametersList = new List<SqlParameter>
             {
+
                 new SqlParameter("@Name", entity.Name),
-                new SqlParameter("@Surname", entity.TaskTime),
-                new SqlParameter("@SecondName", entity.DateOfStart),
-                new SqlParameter("@Position", entity.DateOfEnd),
+                new SqlParameter("@TaskTime", entity.TaskTime),
+                new SqlParameter("@DateOfStart", entity.DateOfStart),
+                new SqlParameter("@DateOfEnd", entity.DateOfEnd),
                 new SqlParameter("@Status", entity.TypeStatus)
             };
             CommonMethods.CommonMethod(sp, parametersList, _connection);
+        }
+
+        public IEnumerable<Task> GettAllById(int id)
+        {
+            List<Task> tasks = new List<Task>();
+            using (SqlConnection SqlCon = _connection)
+            {
+                SqlCommand cmd = new SqlCommand("spGetTasksByProjectId", SqlCon);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@ProjectId", id);
+                SqlCon.Open();
+                SqlDataReader sqlDataReader = cmd.ExecuteReader();
+                while (sqlDataReader.Read())
+                {
+                    Task task = new Task();
+                    task.Id = Convert.ToInt32(sqlDataReader["Id"]);
+                    task.Name = sqlDataReader["Name"].ToString();
+                    task.TaskTime = Convert.ToInt64(sqlDataReader["TaskTime"]);
+                    task.DateOfStart = Convert.ToDateTime(sqlDataReader["DateOfStart"]);
+                    task.DateOfEnd = Convert.ToDateTime(sqlDataReader["DateOfEnd"]);
+                    task.TypeStatus = (Task.EnumTypeOfStatus)Enum.Parse(typeof(Task.EnumTypeOfStatus), sqlDataReader["TypeStatus"].ToString());
+                    tasks.Add(task);
+                }
+                SqlCon.Close();
+            }
+            return tasks;
         }
     }
 }

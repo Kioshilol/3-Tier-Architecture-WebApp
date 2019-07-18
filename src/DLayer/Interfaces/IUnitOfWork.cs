@@ -10,6 +10,7 @@ namespace DLayer.Interfaces
         IRepository<Project> Projects { get; }
         IRepository<Staff> Staff { get; }
         IRepository<Task> Task { get; }
+        IGetAllById<Task> TasksById { get; }
         void Save();
     }
 }

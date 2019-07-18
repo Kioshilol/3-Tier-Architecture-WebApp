@@ -21,6 +21,13 @@ namespace BLayer.Services
         }
         public void Add(TaskDTO entity)
         {
+            entity.DateOfStart = DateTime.Now;
+            TimeSpan timeOfTask = entity.DateOfEnd.Subtract(entity.DateOfStart);
+            long timeOfTaskDays = timeOfTask.Days;
+            if (timeOfTaskDays < 1)
+                throw new Exception("Wrong Number(less than 1)");
+            else
+                entity.TaskTime = timeOfTaskDays;
             var task = taskMapper.Map(entity);
             DataBase.Task.Insert(task);
         }

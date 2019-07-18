@@ -14,6 +14,7 @@ namespace DLayer
         private ProjectRep projectRep;
         private StaffRep staffRep;
         private TaskRep taskRep;
+        private TaskRep taskByIdRep;
         string connectionString = @"Data Source=.\SQLEXPRESS;Database=TrainingTask;Trusted_Connection=True;MultipleActiveResultSets=true";
         public UnitOfWork()
         {
@@ -44,6 +45,15 @@ namespace DLayer
         {
             get
             {
+                if (taskByIdRep == null)
+                    taskByIdRep = new TaskRep(_connection);
+                return taskByIdRep;
+            }
+        }
+        public IGetAllById<Task> TasksById
+        {
+            get
+            {
                 if (taskRep == null)
                     taskRep = new TaskRep(_connection);
                 return taskRep;
@@ -52,10 +62,13 @@ namespace DLayer
 
         public void Dispose()
         {
+
         }
 
         public void Save()
         {
+
         }
     }
 }
+

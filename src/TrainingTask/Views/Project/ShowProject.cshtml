@@ -6,6 +6,9 @@
 }
     <h2>@ViewData["Title"]</h2>
 
+    <div class="form-group">
+        <a asp-action="CreateTaskIntoProject" class="btn btn-default">Create task</a>
+    </div>
     <form asp-action="ShowProject" asp-controller="ProjectController" asp-route-id="@Model.Id">
         <table class="table table-striped">
             <tr>
@@ -13,12 +16,31 @@
                 <td>Name</td>
                 <td>ShortName</td>
                 <td>Description</td>
+                <td>List of tasks</td>
             </tr>
             <tr>
                 <td>@Model.Id</td>
                 <td>@Model.Name</td>
                 <td>@Model.ShortName</td>
                 <td>@Model.Description</td>
+                <td>
+                    @foreach (var item in Model.tasks)
+                    {
+                        <label>Id: </label>@item.Id
+                        <br />
+                        <label>Name: </label>@item.Name
+                        <br />
+                        <label>Task time: </label>@item.TaskTime
+                        <br />
+                        <label>DateOfStart: </label>@item.DateOfStart
+                        <br />
+                        <label>DateOfEnd: </label>@item.DateOfEnd
+                        <br />
+                        <label>Status: </label>@item.TypeStatus
+                        <br />
+
+                    }
+                </td>
             </tr>
         </table>
     </form>

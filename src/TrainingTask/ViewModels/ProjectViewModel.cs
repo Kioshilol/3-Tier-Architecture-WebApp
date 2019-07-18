@@ -11,5 +11,6 @@ namespace TrainingTask.Models
         public string Name { get; set; }
         public string ShortName { get; set; }
         public string Description { get; set; }
+        public ICollection<TaskViewModel> tasks { get; set; }
     }
 }
