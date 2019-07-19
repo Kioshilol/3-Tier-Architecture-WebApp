@@ -94,12 +94,12 @@ namespace DLayer.Repositories
             string sp = "spAddTask";
             List<SqlParameter> parametersList = new List<SqlParameter>
             {
-
                 new SqlParameter("@Name", entity.Name),
                 new SqlParameter("@TaskTime", entity.TaskTime),
                 new SqlParameter("@DateOfStart", entity.DateOfStart),
                 new SqlParameter("@DateOfEnd", entity.DateOfEnd),
-                new SqlParameter("@Status", entity.TypeStatus)
+                new SqlParameter("@Status", entity.TypeStatus),
+                new SqlParameter("@ProjectId", entity.ProjectId)
             };
             CommonMethods.CommonMethod(sp, parametersList, _connection);
         }

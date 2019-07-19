@@ -7,7 +7,7 @@
     <h2>@ViewData["Title"]</h2>
 
     <div class="form-group">
-        <a asp-action="CreateTaskIntoProject" class="btn btn-default">Create task</a>
+        <a asp-controller="Task" asp-action="CreateTask" class="btn btn-default" asp-route-projectid="@Model.Id">Create task</a>
     </div>
     <form asp-action="ShowProject" asp-controller="ProjectController" asp-route-id="@Model.Id">
         <table class="table table-striped">
@@ -24,7 +24,7 @@
                 <td>@Model.ShortName</td>
                 <td>@Model.Description</td>
                 <td>
-                    @foreach (var item in Model.tasks)
+                    @foreach (var item in Model.Tasks)
                     {
                         <label>Id: </label>@item.Id
                         <br />
@@ -38,7 +38,6 @@
                         <br />
                         <label>Status: </label>@item.TypeStatus
                         <br />
-
                     }
                 </td>
             </tr>

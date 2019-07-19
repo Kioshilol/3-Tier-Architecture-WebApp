@@ -10,30 +10,32 @@ namespace TrainingTask.Mapper
 {
     public class TaskMapper : IBaseMapper<TaskDTO, TaskViewModel>
     {
-            public TaskDTO Map(TaskViewModel item)
+        public TaskDTO Map(TaskViewModel item)
+        {
+            return new TaskDTO()
             {
-                return new TaskDTO()
-                {
-                    Id = item.Id,
-                    Name = item.Name,
-                    TaskTime = item.TaskTime,
-                    DateOfStart = item.DateOfStart,
-                    DateOfEnd = item.DateOfEnd,
-                    TypeStatus = (TaskDTO.EnumTypeOfStatus)item.TypeStatus
-                };
-            }
+                Id = item.Id,
+                Name = item.Name,
+                TaskTime = item.TaskTime,
+                DateOfStart = item.DateOfStart,
+                DateOfEnd = item.DateOfEnd,
+                TypeStatus = (TaskDTO.EnumTypeOfStatus)item.TypeStatus,
+                ProjectId = item.ProjectId.Value
+            };
+        }
 
-            public TaskViewModel Map(TaskDTO item)
+        public TaskViewModel Map(TaskDTO item)
+        {
+            return new TaskViewModel()
             {
-                return new TaskViewModel()
-                {
-                    Id = item.Id,
-                    Name = item.Name,
-                    TaskTime = item.TaskTime,
-                    DateOfStart = item.DateOfStart,
-                    DateOfEnd = item.DateOfEnd,
-                    TypeStatus = (TaskViewModel.EnumTypeOfStatus)item.TypeStatus
-                };
-            }
+                Id = item.Id,
+                Name = item.Name,
+                TaskTime = item.TaskTime,
+                DateOfStart = item.DateOfStart,
+                DateOfEnd = item.DateOfEnd,
+                TypeStatus = (TaskViewModel.EnumTypeOfStatus)item.TypeStatus,
+                ProjectId = item.ProjectId
+            };
+        }
     }
 }

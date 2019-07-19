@@ -9,7 +9,7 @@
 
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="CreateTask">
+        <form action="~/Task/CreateTask" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
@@ -17,6 +17,15 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                @if (Model.ProjectId.HasValue)
+                {
+                    <input asp-for="ProjectId" class="form-control" readonly />
+                }
+                else
+                {
+                    @Html.DropDownListFor(model => model.ProjectId, ViewBag.Projects as SelectList, new { @class = "form-control" })
+                }
             </div>
             <div class="form-group">
                 <label asp-for="DateOfEnd" class="control-label"></label>
@@ -25,6 +34,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="TypeStatus" class="control-label"></label>
+                <select asp-for="TypeStatus" asp-items="Html.GetEnumSelectList<TrainingTask.Models.TaskViewModel.EnumTypeOfStatus>()" class="form-control"></select>
                 <span asp-validation-for="TypeStatus" class="text-danger"></span>
             </div>
             <div class="form-group">

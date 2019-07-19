@@ -17,6 +17,7 @@
             <td>Date of start</td>
             <td>Date of end</td>
             <td>Status</td>
+            <td>Performer</td>
             <td>Edit</td>
             <td>Delete</td>
         </tr>
@@ -29,6 +30,7 @@
         <td>@item.DateOfStart</td>
         <td>@item.DateOfEnd</td>
         <td>@item.TypeStatus</td>
+        <td>@item.Project.ShortName</td>
         <td><a asp-action="EditTask" asp-controller="Task" asp-route-id="@item.Id">Edit</a></td>
         <td><a asp-action="DeleteTask" asp-controller="Task" asp-route-id="@item.Id">Delete</a></td>
     </tr>

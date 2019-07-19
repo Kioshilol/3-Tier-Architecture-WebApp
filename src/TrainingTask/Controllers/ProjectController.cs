@@ -14,6 +14,7 @@ namespace TrainingTask.Controllers
         private ProjectService projectService;
         private ProjectService projectServiceForTasks;
         private ProjectMapper projectMapper;
+        private TaskService taskService;
         private TaskMapper taskMapper;
         public ProjectController()
         {
@@ -21,8 +22,8 @@ namespace TrainingTask.Controllers
             this.projectService = new ProjectService();
             this.taskMapper = new TaskMapper();
             this.projectServiceForTasks = new ProjectService();
+            this.taskService = new TaskService();
         }
-
         public IActionResult Index()
         {
             var projectViewModelList = new List<ProjectViewModel>();
@@ -76,18 +77,20 @@ namespace TrainingTask.Controllers
             projectService.Delete(id);
             return RedirectToAction("Index");
         }
-
+        [Route("projects/{id}")]
         public IActionResult ShowProject(int id)
         {
+
             var projectDTO = projectService.GetById(id);
             var projectModelView = projectMapper.Map(projectDTO);
             var tasksDTO = projectServiceForTasks.GetTasksByProjectId(id);
-            projectModelView.tasks = new List<TaskViewModel>();
+            projectModelView.Tasks = new List<TaskViewModel>();
             foreach(var task in tasksDTO)
             {
                 var taskViewModel = taskMapper.Map(task);
-                projectModelView.tasks.Add(taskViewModel);
+                projectModelView.Tasks.Add(taskViewModel);
             }
+            TempData["ProjectId"] = projectModelView.Id;
             return View(projectModelView);
         }
 
@@ -95,7 +98,6 @@ namespace TrainingTask.Controllers
         {
             return View();
         }
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
@@ -107,10 +109,13 @@ namespace TrainingTask.Controllers
             return View();
         }
 
-        [HttpPost]
-        public IActionResult CreateTaskIntoProject(TaskViewModel task)
-        {
-            return RedirectToAction("Index");
-        }
+        //[HttpPost]
+        //public IActionResult CreateTaskIntoProject(TaskViewModel task)
+        //{
+        //    task.ProjectId = (int)TempData["ProjectId"];
+        //    var projectDTO = taskMapper.Map(task);
+        //    taskService.Add(projectDTO);
+        //    return RedirectToAction("Index");
+        //}
     }
 }

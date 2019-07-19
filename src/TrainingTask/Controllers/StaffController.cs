@@ -15,6 +15,7 @@ namespace TrainingTask.Controllers
             this.staffService = new StaffService();
             this.staffMapper = new StaffMapper();
         }
+        [HttpGet()]
         public IActionResult Staff()
         {
             var staffViewModelList = new List<StaffViewModel>();

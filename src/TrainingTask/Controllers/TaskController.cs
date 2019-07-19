@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BLayer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -28,11 +29,12 @@ namespace TrainingTask.Controllers
             foreach (var task in taskList)
             {
                 var taskViewModel = taskMapper.Map(task);
+                taskViewModel.Project = new ProjectViewModel();
                 taskViewModelList.Add(taskViewModel);
             }
             return View(taskViewModelList);
         }
-
+        [HttpGet("CreateTask")]
         public IActionResult CreateTask()
         {
             var projectsDTO = projectService.GetAll();
@@ -41,9 +43,30 @@ namespace TrainingTask.Controllers
             {
                 var projectViewModel = projectMapper.Map(project);
                 projectsViewModel.Add(projectViewModel);
-                ViewBag.Projects = projectsViewModel;
             }
-            return View();
+            SelectList projects = new SelectList(projectsViewModel, "Id","Name");
+            ViewBag.Projects = projects;
+            return View(new TaskViewModel());
+        }
+
+        [HttpGet("projects/{projectid}/CreateTask/")]
+        public IActionResult CreateTask(int projectid)
+        {
+            var model = new TaskViewModel()
+            {
+                DateOfEnd = DateTime.Now
+            };
+
+            var projectDto = projectService.GetById(projectid);
+            if (projectDto != null)
+            {
+                model.ProjectId = projectid;
+                model.Project = projectMapper.Map(projectDto);
+
+                return View(model);
+            }
+
+            return new BadRequestResult();
         }
 
         [HttpPost]

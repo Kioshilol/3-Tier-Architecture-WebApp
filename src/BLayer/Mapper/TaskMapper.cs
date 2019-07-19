@@ -18,6 +18,9 @@ namespace BLayer.Mapper
                 DateOfStart = item.DateOfStart,
                 DateOfEnd = item.DateOfEnd,
                 TypeStatus = (Task.EnumTypeOfStatus)item.TypeStatus,
+                ProjectId = item.ProjectId,
+                
+                
             };
         }
 
@@ -30,7 +33,8 @@ namespace BLayer.Mapper
                 TaskTime = item.TaskTime,
                 DateOfStart = item.DateOfStart,
                 DateOfEnd = item.DateOfEnd,
-                TypeStatus = (TaskDTO.EnumTypeOfStatus)item.TypeStatus
+                TypeStatus = (TaskDTO.EnumTypeOfStatus)item.TypeStatus,
+                ProjectId = item.ProjectId
             };
         }
     }
