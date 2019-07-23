@@ -28,6 +28,13 @@
                 }
             </div>
             <div class="form-group">
+                @foreach (var item in ViewBag.Staff)
+                {
+                    <label>@item.Name</label>
+                    <input  type="checkbox" name="selectedStaff" value="@item.Id" />
+                }
+            </div>
+            <div class="form-group">
                 <label asp-for="DateOfEnd" class="control-label"></label>
                 <input asp-for="DateOfEnd" class="form-control" />
                 <span asp-validation-for="DateOfEnd" class="text-danger"></span>

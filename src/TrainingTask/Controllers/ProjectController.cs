@@ -77,10 +77,10 @@ namespace TrainingTask.Controllers
             projectService.Delete(id);
             return RedirectToAction("Index");
         }
+
         [Route("projects/{id}")]
         public IActionResult ShowProject(int id)
         {
-
             var projectDTO = projectService.GetById(id);
             var projectModelView = projectMapper.Map(projectDTO);
             var tasksDTO = projectServiceForTasks.GetTasksByProjectId(id);
@@ -90,7 +90,6 @@ namespace TrainingTask.Controllers
                 var taskViewModel = taskMapper.Map(task);
                 projectModelView.Tasks.Add(taskViewModel);
             }
-            TempData["ProjectId"] = projectModelView.Id;
             return View(projectModelView);
         }
 

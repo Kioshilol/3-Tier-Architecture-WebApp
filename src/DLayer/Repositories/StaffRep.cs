@@ -85,7 +85,7 @@ namespace DLayer.Repositories
             return staff;
         }
 
-        public void Insert(Staff entity)
+        public int Insert(Staff entity)
         {
             string sp = "spAddStaff";
             List<SqlParameter> parametersList = new List<SqlParameter>
@@ -96,6 +96,7 @@ namespace DLayer.Repositories
                 new SqlParameter("@Position", entity.Position)
             };
             CommonMethods.CommonMethod(sp, parametersList, _connection);
+            return entity.Id;
         }
     }
 }

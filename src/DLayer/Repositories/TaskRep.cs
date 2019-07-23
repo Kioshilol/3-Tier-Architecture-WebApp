@@ -8,7 +8,7 @@ using System.Text;
 
 namespace DLayer.Repositories
 {
-    public class TaskRep : IRepository<Task>, IGetAllById<Task>
+    public class TaskRep : IRepository<Task>, IGetAllById<Task>, IInsert<Task>
     {
         private SqlConnection _connection;
         public TaskRep(SqlConnection connection)
@@ -58,6 +58,7 @@ namespace DLayer.Repositories
                     task.DateOfStart = Convert.ToDateTime(sqlDataReader["DateOfStart"]);
                     task.DateOfEnd = Convert.ToDateTime(sqlDataReader["DateOfEnd"]);
                     task.TypeStatus = (Task.EnumTypeOfStatus)Enum.Parse(typeof(Task.EnumTypeOfStatus), sqlDataReader["TypeStatus"].ToString());
+                    task.ProjectId = Convert.ToInt32(sqlDataReader["ProjectId"]);
                     taskList.Add(task);
                 }
                 SqlCon.Close();
@@ -89,7 +90,7 @@ namespace DLayer.Repositories
             return task;
         }
 
-        public void Insert(Task entity)
+        public int Insert(Task entity)
         {
             string sp = "spAddTask";
             List<SqlParameter> parametersList = new List<SqlParameter>
@@ -102,6 +103,7 @@ namespace DLayer.Repositories
                 new SqlParameter("@ProjectId", entity.ProjectId)
             };
             CommonMethods.CommonMethod(sp, parametersList, _connection);
+            return entity.Id;
         }
 
         public IEnumerable<Task> GettAllById(int id)
@@ -128,6 +130,17 @@ namespace DLayer.Repositories
                 SqlCon.Close();
             }
             return tasks;
+        }
+        public void InsertStaff(int StaffId,int TaskId)
+        {
+            string sp = "spAddTasksStaff";
+            List<SqlParameter> parametersList = new List<SqlParameter>
+            {
+                new SqlParameter("@StaffId", StaffId),
+                new SqlParameter("@TaskId", TaskId)
+            };
+            CommonMethods.CommonMethod(sp, parametersList, _connection);
+
         }
     }
 }

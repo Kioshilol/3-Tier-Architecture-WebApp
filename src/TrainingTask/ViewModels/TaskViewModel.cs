@@ -14,9 +14,12 @@ namespace TrainingTask.Models
         public int? ProjectId { get; set; }
         public ProjectViewModel Project { get; set; }
         public long TaskTime { get; set; }
+        [DataType(DataType.Date)]
         public DateTime DateOfStart { get; set; }
+        [DataType(DataType.Date)]
         public DateTime DateOfEnd { get; set; }
         public EnumTypeOfStatus TypeStatus { get; set; }
+        public ICollection<StaffViewModel> staff { get; set; }
         public enum EnumTypeOfStatus
         {
             [Display(Name = "Not Started")]

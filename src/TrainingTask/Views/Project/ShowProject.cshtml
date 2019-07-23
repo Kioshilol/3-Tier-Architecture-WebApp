@@ -16,7 +16,7 @@
                 <td>Name</td>
                 <td>ShortName</td>
                 <td>Description</td>
-                <td>List of tasks</td>
+                <th>List of tasks</th>
             </tr>
             <tr>
                 <td>@Model.Id</td>
@@ -38,9 +38,14 @@
                         <br />
                         <label>Status: </label>@item.TypeStatus
                         <br />
+                        <a asp-action="EditTask" asp-controller="Task" asp-route-id="@item.Id">Edit</a>
+                        <a asp-action="DeleteTask" asp-controller="Task" asp-route-id="@item.Id">Delete</a>
+                        <br />
+                        <br />
+
                     }
                 </td>
-            </tr>
+                </tr>
         </table>
     </form>
     <div>

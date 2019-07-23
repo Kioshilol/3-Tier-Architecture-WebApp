@@ -4,6 +4,7 @@ using BLayer.Mapper;
 using DLayer;
 using DLayer.Entities;
 using DLayer.Interfaces;
+using DLayer.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -19,7 +20,7 @@ namespace BLayer.Services
             DataBase = new UnitOfWork();
             taskMapper = new TaskMapper();
         }
-        public void Add(TaskDTO entity)
+        public int Add(TaskDTO entity)
         {
             entity.DateOfStart = DateTime.Now;
             TimeSpan timeOfTask = entity.DateOfEnd.Subtract(entity.DateOfStart);
@@ -29,7 +30,8 @@ namespace BLayer.Services
             else
                 entity.TaskTime = timeOfTaskDays;
             var task = taskMapper.Map(entity);
-            DataBase.Task.Insert(task);
+            int id = DataBase.Task.Insert(task);
+            return id;
         }
 
         public void Delete(int id)
@@ -60,6 +62,14 @@ namespace BLayer.Services
             var task = DataBase.Task.GetById(id);
             var taskDTO = taskMapper.Map(task);
             return taskDTO;
+        }
+        public void InsertStaff(TaskDTO entity)
+        {
+            var task = taskMapper.Map(entity);
+            foreach(var item in entity.staffId)
+            {
+                DataBase.InsertStaff.InsertStaff(item, entity.Id);
+            }
         }
     }
 }

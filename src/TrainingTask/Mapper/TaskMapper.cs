@@ -20,7 +20,7 @@ namespace TrainingTask.Mapper
                 DateOfStart = item.DateOfStart,
                 DateOfEnd = item.DateOfEnd,
                 TypeStatus = (TaskDTO.EnumTypeOfStatus)item.TypeStatus,
-                ProjectId = item.ProjectId.Value
+                ProjectId = item.ProjectId
             };
         }
 

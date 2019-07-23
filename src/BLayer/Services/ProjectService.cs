@@ -41,10 +41,11 @@ namespace BLayer.Services
             return projects;
         }
 
-        public void Add(ProjectDTO entity)
+        public int Add(ProjectDTO entity)
         {
             var project = projectMapper.Map(entity);
-            DataBase.Projects.Insert(project);
+            int id = DataBase.Projects.Insert(project);
+            return id;
         }
 
         public void Edit(ProjectDTO entity)

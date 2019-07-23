@@ -20,10 +20,11 @@ namespace BLayer.Services
             staffMapper = new StaffMapper();
         }
 
-        public void Add(StaffDTO entity)
+        public int Add(StaffDTO entity)
         {
             var staff = staffMapper.Map(entity);
-            DataBase.Staff.Insert(staff);
+            int id  = DataBase.Staff.Insert(staff);
+            return id;
         }
 
         public void Edit(StaffDTO entity)

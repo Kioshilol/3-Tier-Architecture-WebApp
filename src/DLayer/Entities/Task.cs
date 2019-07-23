@@ -14,7 +14,8 @@ namespace DLayer.Entities
         public DateTime DateOfStart { get; set; }
         public DateTime DateOfEnd { get; set; }
         public  EnumTypeOfStatus TypeStatus { get; set; }
-        public int ProjectId { get; set; }
+        public int? ProjectId { get; set; }
+        public int[] staffId { get; set; }
         public enum EnumTypeOfStatus
         {
             [Display(Name = "Not Started")]

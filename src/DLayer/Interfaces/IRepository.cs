@@ -8,7 +8,7 @@ namespace DLayer
 {
     public interface IRepository<T>
     {
-        void Insert(T entity);
+        int Insert(T entity);
         void Delete(int id);
         void Edit(T entity);
         IEnumerable<T> GetAll();

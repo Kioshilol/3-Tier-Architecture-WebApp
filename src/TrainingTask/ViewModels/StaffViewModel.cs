@@ -12,5 +12,6 @@ namespace TrainingTask.Models
         public string Name { get; set; }
         public string SecondName { get; set; }
         public string Position { get; set; }
+        public IEnumerable<StaffViewModel> staff { get; set; }
     }
 }

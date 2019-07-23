@@ -84,7 +84,7 @@ namespace DLayer.Repositories
             return project;
         }
 
-        public void Insert(Project entity)
+        public int Insert(Project entity)
         {
             string sp = "spAddProject";
             List<SqlParameter> parametersList = new List<SqlParameter>
@@ -94,6 +94,7 @@ namespace DLayer.Repositories
                 new SqlParameter("@Description", entity.Description)
             };
             CommonMethods.CommonMethod(sp, parametersList, _connection);
+            return entity.Id;
         }
     }
 }

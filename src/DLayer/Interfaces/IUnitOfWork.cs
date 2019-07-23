@@ -11,6 +11,7 @@ namespace DLayer.Interfaces
         IRepository<Staff> Staff { get; }
         IRepository<Task> Task { get; }
         IGetAllById<Task> TasksById { get; }
+        IInsert<Task> InsertStaff { get; }
         void Save();
     }
 }
