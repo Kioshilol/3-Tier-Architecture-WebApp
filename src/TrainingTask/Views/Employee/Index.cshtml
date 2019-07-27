@@ -1,0 +1,40 @@
+﻿@model TrainingTask.ViewModels.IndexViewModel<EmployeeViewModel>
+@{
+    ViewData["Title"] = "Employee";
+}
+<h2>@ViewData["Title"]</h2>
+
+<body>
+    <div class="form-group">
+        <a asp-action="Edit" asp-controller="Employee" class="btn btn-default">Create</a>
+    </div>
+    <table class="table table-striped">
+        <tr>
+            <td>Id</td>
+            <td>Name</td>
+            <td>Surname</td>
+            <td>Second Name</td>
+            <td>Position</td>
+            <td>Edit</td>
+            <td>Delete</td>
+        </tr>
+        @foreach (var item in Model.ViewModelList)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td><a asp-action="Details" asp-controller="Employee" asp-route-id="@item.Id">@item.Name</a></td>
+                <td>@item.Name</td>
+                <td>@item.Surname</td>
+                <td>@item.Position</td>
+                <td><a asp-action="Edit" asp-controller="Employee" asp-route-id="@item.Id">Edit</a></td>
+                <td><a asp-action="Delete" asp-controller="Employee" asp-route-id="@item.Id">Delete</a></td>
+            </tr>
+        }
+    </table>
+    <div class="form-group">
+        @for (int i = 1; i <= Model.Page.TotalPages; i++)
+        {
+            <a asp-action="Index" asp-controller="Employee" asp-route-page="@i" class="btn btn-default">@i</a>
+        }
+    </div>
+</body>

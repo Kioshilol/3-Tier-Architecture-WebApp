@@ -1,4 +1,5 @@
 ﻿using BLayer.DTO;
+using Core.Enum;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -18,18 +19,6 @@ namespace TrainingTask.Models
         public DateTime DateOfStart { get; set; }
         [DataType(DataType.Date)]
         public DateTime DateOfEnd { get; set; }
-        public EnumTypeOfStatus TypeStatus { get; set; }
-        public ICollection<StaffViewModel> staff { get; set; }
-        public enum EnumTypeOfStatus
-        {
-            [Display(Name = "Not Started")]
-            NotStarted,
-            [Display(Name = "In Process")]
-            InProcess,
-            [Display(Name = "Completed")]
-            Completed,
-            [Display(Name = "Delayed")]
-            Delayed
-        }
+        public Status TypeStatus { get; set; }
     }
 }

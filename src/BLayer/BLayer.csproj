@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\DLayer.EF\DLayer.EF.csproj" />
     <ProjectReference Include="..\DLayer\DLayer.csproj" />
   </ItemGroup>
 

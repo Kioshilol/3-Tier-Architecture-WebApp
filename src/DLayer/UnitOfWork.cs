@@ -1,85 +1,48 @@
-﻿using DLayer.Entities;
+﻿using Core.Interfaces;
+using DLayer.Entities;
 using DLayer.Interfaces;
 using DLayer.Repositories;
-using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Text;
 
 namespace DLayer
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private SqlConnection _connection;
-        private ProjectRep projectRep;
-        private StaffRep staffRep;
-        private TaskRep taskRep;
-        private TaskRep taskByIdRep;
-        private TaskRep taskInsertStaff;
-        string connectionString = @"Data Source=.\SQLEXPRESS;Database=TrainingTask;Trusted_Connection=True;MultipleActiveResultSets=true";
-        public UnitOfWork()
+        private IRepository<Employee> _employee;
+        private ITaskRepository<Task> _task;
+        private IRepository<Project> _project;
+        public UnitOfWork(IRepository<Employee> employee, IRepository<Project> project, ITaskRepository<Task> task)
         {
-            _connection = new SqlConnection(connectionString);
+            _employee = employee;
+            _project = project;
+            _task = task;
         }
 
         public IRepository<Project> Projects
         {
             get
             {
-                if (projectRep == null)
-                    projectRep = new ProjectRep(_connection);
-                return projectRep;
+                return _project;
             }
         }
 
-        public IRepository<Staff> Staff
+        public IRepository<Employee> Employee
         {
             get
             {
-                if (staffRep == null)
-                    staffRep = new StaffRep(_connection);
-                return staffRep;
+                return _employee;
             }
         }
 
-        public IRepository<Task> Task
+        public ITaskRepository<Task> Task
         {
             get
             {
-                if (taskByIdRep == null)
-                    taskByIdRep = new TaskRep(_connection);
-                return taskByIdRep;
+                return _task;
             }
         }
-        public IGetAllById<Task> TasksById
-        {
-            get
-            {
-                if (taskRep == null)
-                    taskRep = new TaskRep(_connection);
-                return taskRep;
-            }
-        }
-
-        public IInsert<Task> InsertStaff
-        {
-            get
-            {
-                if (taskInsertStaff == null)
-                    taskInsertStaff = new TaskRep(_connection);
-                return taskInsertStaff;
-            }
-        }
-
-        public void Dispose()
-        {
-
-        }
-
-        public void Save()
-        {
-
-        }
+        public void Dispose(){   }
+        public void Save(){   }
     }
 }
 

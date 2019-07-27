@@ -1,10 +1,11 @@
 ﻿using BLayer.DTO;
 using BLayer.Mapper;
+using Core.Interfaces;
 using TrainingTask.Models;
 
 namespace TrainingTask.Mapping
 {
-    public class ProjectMapper : IBaseMapper<ProjectDTO, ProjectViewModel>
+    public class ProjectMapper : IMapper<ProjectDTO, ProjectViewModel>
     {
         public ProjectDTO Map(ProjectViewModel item)
         {

@@ -1,0 +1,45 @@
+﻿@model TrainingTask.ViewModels.IndexViewModel<TaskViewModel>
+@{
+    ViewData["Title"] = "Task";
+}
+<h2>@ViewData["Title"]</h2>
+
+
+<body>
+    <div class="form-group">
+        <a asp-action="Create" asp-controller="Task" class="btn btn-default">Create</a>
+    </div>
+    <table class="table table-striped">
+        <tr>
+            <td>Id</td>
+            <td>Name</td>
+            <td>Task Time</td>
+            <td>Date of start</td>
+            <td>Date of end</td>
+            <td>Status</td>
+            <td>Project</td>
+            <td>Edit</td>
+            <td>Delete</td>
+        </tr>
+        @foreach (var item in Model.ViewModelList)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td><a asp-action="Details" asp-controller="Task" asp-route-id="@item.Id">@item.Name</a></td>
+                <td>@item.TaskTime</td>
+                <td>@item.DateOfStart</td>
+                <td>@item.DateOfEnd</td>
+                <td>@item.TypeStatus</td>
+                <td>@item.Project.ShortName</td>
+                <td><a asp-action="Edit" asp-controller="Task" asp-route-id="@item.Id">Edit</a></td>
+                <td><a asp-action="Delete" asp-controller="Task" asp-route-id="@item.Id">Delete</a></td>
+            </tr>
+        }
+    </table>
+    <div class="form-group">
+        @for (int i = 1; i <= Model.Page.TotalPages; i++)
+        {
+            <a asp-action="Index" asp-controller="Task" asp-route-page="@i" class="btn btn-default">@i</a>
+        }
+    </div>
+</body>

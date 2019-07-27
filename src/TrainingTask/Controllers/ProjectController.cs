@@ -1,95 +1,123 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using BLayer.DTO;
+using BLayer.Interfaces;
 using BLayer.Services;
 using Microsoft.AspNetCore.Mvc;
 using TrainingTask.Mapper;
 using TrainingTask.Mapping;
 using TrainingTask.Models;
+using TrainingTask.ViewModels;
 
 namespace TrainingTask.Controllers
 {
     public class ProjectController : Controller
     {
-        private ProjectService projectService;
-        private ProjectService projectServiceForTasks;
+        private IService<ProjectDTO> _projectService;
+        private ITaskService<TaskDTO> _taskService;
         private ProjectMapper projectMapper;
-        private TaskService taskService;
         private TaskMapper taskMapper;
-        public ProjectController()
+        public ProjectController(IService<ProjectDTO> projectService, ITaskService<TaskDTO> taskService)
         {
-            this.projectMapper = new ProjectMapper();
-            this.projectService = new ProjectService();
-            this.taskMapper = new TaskMapper();
-            this.projectServiceForTasks = new ProjectService();
-            this.taskService = new TaskService();
+            _projectService = projectService;
+            _taskService = taskService;
+            projectMapper = new ProjectMapper();
+            taskMapper = new TaskMapper();
         }
-        public IActionResult Index()
+        public IActionResult Index(int page = 1)
         {
             var projectViewModelList = new List<ProjectViewModel>();
-            IEnumerable<ProjectDTO> projectList = projectService.GetAll();
+            IEnumerable<ProjectDTO> projectPagingList = _projectService.GetAllWithPaging(page);
+            var allProjects = new List<ProjectViewModel>();
+            IEnumerable<ProjectDTO> projectList = _projectService.GetAll();
+
             foreach (var project in projectList)
+            {
+                var projectViewModel = this.projectMapper.Map(project);
+                allProjects.Add(projectViewModel);
+            }
+
+            foreach (var project in projectPagingList)
             {
                 var projectViewModel = this.projectMapper.Map(project);
                 projectViewModelList.Add(projectViewModel);
             }
-            return View(projectViewModelList);
+
+            var pageViewModel = new PageViewModel
+            {
+                PageNumber = page,
+                RowsPerPage = PageSetting.GetRowsPerPage(),
+                TotalRecords = allProjects.Count,
+                TotalPages = allProjects.Count / PageSetting.GetRowsPerPage()
+            };
+
+            var indexViewModel = new IndexViewModel<ProjectViewModel>
+            {
+                ViewModelList = projectViewModelList,
+                Page = pageViewModel
+            };
+
+            return View(indexViewModel);
         }
 
-        public IActionResult CreateProject()
+        public IActionResult Edit(int? id)
         {
-            return View();
+            if (id.HasValue)
+            {
+                var projectDTO = _projectService.GetById(id.Value);
+                var projectModelView = projectMapper.Map(projectDTO);
+                return View(projectModelView);
+            }
+            else
+            {
+                return View(new ProjectViewModel());
+            }
         }
 
         [HttpPost]
-        public IActionResult CreateProject(ProjectViewModel project)
+        public IActionResult Edit(ProjectViewModel project)
         {
-            var projectDTO = projectMapper.Map(project);
-            projectService.Add(projectDTO);
+            if (project.Id.HasValue)
+            {
+                var projectDTO = projectMapper.Map(project);
+                _projectService.Edit(projectDTO);
+            }
+            else
+            {
+                var projectDTO = projectMapper.Map(project);
+                _projectService.Add(projectDTO);
+            }
             return RedirectToAction("Index");
         }
 
-        public IActionResult EditProject(int id)
+        public IActionResult Delete(int id)
         {
-            var projectDTO = projectService.GetById(id);
+            var projectDTO = _projectService.GetById(id);
             var projectModelView = projectMapper.Map(projectDTO);
             return View(projectModelView);
         }
 
-        [HttpPost]
-        public IActionResult EditProject(ProjectViewModel project)
-        {
-            var projectDTO = projectMapper.Map(project);
-            projectService.Edit(projectDTO);
-            return RedirectToAction("Index");
-        }
-
-        public IActionResult DeleteProject(int id)
-        {
-            var projectDTO = projectService.GetById(id);
-            var projectModelView = projectMapper.Map(projectDTO);
-            return View(projectModelView);
-        }
-
-        [HttpPost, ActionName("DeleteProject")]
+        [HttpPost, ActionName("Delete")]
         public IActionResult DeleteConfirmed(int id)
         {
-            projectService.Delete(id);
+            _projectService.Delete(id);
             return RedirectToAction("Index");
         }
 
         [Route("projects/{id}")]
-        public IActionResult ShowProject(int id)
+        public IActionResult Details(int id)
         {
-            var projectDTO = projectService.GetById(id);
+            var projectDTO = _projectService.GetById(id);
             var projectModelView = projectMapper.Map(projectDTO);
-            var tasksDTO = projectServiceForTasks.GetTasksByProjectId(id);
+            var tasksDTO = _taskService.GetAllTasksByProjectId(id);
             projectModelView.Tasks = new List<TaskViewModel>();
+
             foreach(var task in tasksDTO)
             {
                 var taskViewModel = taskMapper.Map(task);
                 projectModelView.Tasks.Add(taskViewModel);
             }
+            TempData["ProjectId"] = projectModelView.Id;
             return View(projectModelView);
         }
 
@@ -102,19 +130,5 @@ namespace TrainingTask.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-
-        public IActionResult CreateTaskIntoProject()
-        {
-            return View();
-        }
-
-        //[HttpPost]
-        //public IActionResult CreateTaskIntoProject(TaskViewModel task)
-        //{
-        //    task.ProjectId = (int)TempData["ProjectId"];
-        //    var projectDTO = taskMapper.Map(task);
-        //    taskService.Add(projectDTO);
-        //    return RedirectToAction("Index");
-        //}
     }
 }

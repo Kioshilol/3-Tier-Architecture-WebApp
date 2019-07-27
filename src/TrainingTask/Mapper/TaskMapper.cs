@@ -1,14 +1,11 @@
 ﻿using BLayer.DTO;
-using BLayer.Mapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Core.Enum;
+using Core.Interfaces;
 using TrainingTask.Models;
 
 namespace TrainingTask.Mapper
 {
-    public class TaskMapper : IBaseMapper<TaskDTO, TaskViewModel>
+    public class TaskMapper : IMapper<TaskDTO, TaskViewModel>
     {
         public TaskDTO Map(TaskViewModel item)
         {
@@ -19,8 +16,8 @@ namespace TrainingTask.Mapper
                 TaskTime = item.TaskTime,
                 DateOfStart = item.DateOfStart,
                 DateOfEnd = item.DateOfEnd,
-                TypeStatus = (TaskDTO.EnumTypeOfStatus)item.TypeStatus,
-                ProjectId = item.ProjectId
+                TypeStatus = (Status)item.TypeStatus,
+                ProjectId = item.ProjectId.Value
             };
         }
 
@@ -33,7 +30,7 @@ namespace TrainingTask.Mapper
                 TaskTime = item.TaskTime,
                 DateOfStart = item.DateOfStart,
                 DateOfEnd = item.DateOfEnd,
-                TypeStatus = (TaskViewModel.EnumTypeOfStatus)item.TypeStatus,
+                TypeStatus = (Status)item.TypeStatus,
                 ProjectId = item.ProjectId
             };
         }

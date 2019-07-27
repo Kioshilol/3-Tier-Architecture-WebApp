@@ -1,0 +1,53 @@
+﻿@model TrainingTask.Models.ProjectViewModel
+
+@{
+    ViewData["Title"] = Model.Name + " Project";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+    <h2>@ViewData["Title"]</h2>
+
+    <div class="form-group">
+        <a asp-action="Create" asp-controller="Task" class="btn btn-default" asp-route-projectid="@Model.Id">Create task</a>
+    </div>
+    <form asp-action="Details" asp-controller="Project" asp-route-id="@Model.Id">
+        <table class="table table-striped">
+            <tr>
+                <td>Id</td>
+                <td>Name</td>
+                <td>ShortName</td>
+                <td>Description</td>
+                <th>List of tasks</th>
+            </tr>
+            <tr>
+                <td>@Model.Id</td>
+                <td>@Model.Name</td>
+                <td>@Model.ShortName</td>
+                <td>@Model.Description</td>
+                <td>
+                    @foreach (var item in Model.Tasks)
+                    {
+                        <label>Id: </label>@item.Id
+                        <br />
+                        <label>Name: </label>@item.Name
+                        <br />
+                        <label>Task time: </label>@item.TaskTime
+                        <br />
+                        <label>DateOfStart: </label>@item.DateOfStart
+                        <br />
+                        <label>DateOfEnd: </label>@item.DateOfEnd
+                        <br />
+                        <label>Status: </label>@item.TypeStatus
+                        <br />
+                        <a asp-action="Edit" asp-controller="Task" asp-route-id="@item.Id">Edit</a>
+                        <a asp-action="Delete" asp-controller="Task" asp-route-id="@item.Id">Delete</a>
+                        <br />
+                        <br />
+                    }
+                </td>
+                </tr>
+        </table>
+    </form>
+    <div>
+        <a asp-action="Index">Back to List</a>
+    </div>
+

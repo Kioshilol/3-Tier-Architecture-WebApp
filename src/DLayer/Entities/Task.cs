@@ -1,31 +1,25 @@
-﻿using System;
+﻿using Core.Enum;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Linq.Mapping;
 using System.Text;
 
 namespace DLayer.Entities
 {
-    public class Task : IEntity
+    public class Task
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public long TaskTime { get; set; }
         public DateTime DateOfStart { get; set; }
         public DateTime DateOfEnd { get; set; }
-        public  EnumTypeOfStatus TypeStatus { get; set; }
+        public  Status TypeStatus { get; set; }
+        public Project Project { get; set; }
+        [NotMapped]
+        public int[] StaffId { get; set; }
+        public ICollection<EmployeeTasks> StaffTasks { get; set; }
         public int? ProjectId { get; set; }
-        public int[] staffId { get; set; }
-        public enum EnumTypeOfStatus
-        {
-            [Display(Name = "Not Started")]
-            NotStarted,
-            [Display(Name = "In Process")]
-            InProcess,
-            [Display(Name = "Completed")]
-            Completed,
-            [Display(Name = "Delayed")]
-            Delayed
-        }
     }
 }
