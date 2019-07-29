@@ -1,4 +1,5 @@
-﻿using DLayer;
+﻿using Core;
+using DLayer;
 
 namespace TrainingTask.ViewModels
 {

@@ -1,6 +1,7 @@
 ﻿using BLayer.DTO;
 using BLayer.Interfaces;
 using BLayer.Services;
+using Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using TrainingTask.Mapper;
@@ -12,11 +13,11 @@ namespace TrainingTask.Controllers
     public class EmployeeController : Controller
     {
         private IService<EmployeeDTO> _employeeService;
-        private AutoEmployeeMapper _employeeMapper;
-        public EmployeeController(IService<EmployeeDTO> employeeService)
+        private IMapper<EmployeeDTO,EmployeeViewModel> _employeeMapper;
+        public EmployeeController(IService<EmployeeDTO> employeeService, IMapper<EmployeeDTO, EmployeeViewModel> employeeMapper)
         {
             _employeeService = employeeService;
-            _employeeMapper = new AutoEmployeeMapper();
+            _employeeMapper = employeeMapper;
         }
         [HttpGet()]
         public IActionResult Index(int page = 1)

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using AutoMapper;
 using BLayer.DTO;
 using BLayer.Interfaces;
+using Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using TrainingTask.Mapper;
 using TrainingTask.Models;
@@ -14,14 +15,14 @@ namespace TrainingTask.Controllers
     {
         private IService<ProjectDTO> _projectService;
         private ITaskService<TaskDTO> _taskService;
-        private AutoProjectMapper projectMapper;
-        private AutoTaskMapper taskMapper;
-        public ProjectController(IService<ProjectDTO> projectService, ITaskService<TaskDTO> taskService)
+        private IMapper<ProjectDTO, ProjectViewModel> _projectMapper;
+        private IMapper<TaskDTO, TaskViewModel> _taskMapper;
+        public ProjectController(IService<ProjectDTO> projectService, ITaskService<TaskDTO> taskService, IMapper<ProjectDTO, ProjectViewModel> projectMapper, IMapper<TaskDTO, TaskViewModel> taskMapper)
         {
             _projectService = projectService;
             _taskService = taskService;
-            projectMapper = new AutoProjectMapper();
-            taskMapper = new AutoTaskMapper();
+            _projectMapper = projectMapper;
+            _taskMapper = taskMapper;
         }
         public IActionResult Index(int page = 1)
         {
@@ -32,13 +33,13 @@ namespace TrainingTask.Controllers
 
             foreach (var project in projectList)
             {
-                var projectViewModel = this.projectMapper.Map(project);
+                var projectViewModel = this._projectMapper.Map(project);
                 allProjects.Add(projectViewModel);
             }
 
             foreach (var project in projectPagingList)
             {
-                var projectViewModel = this.projectMapper.Map(project);
+                var projectViewModel = this._projectMapper.Map(project);
                 projectViewModelList.Add(projectViewModel);
             }
 
@@ -66,7 +67,7 @@ namespace TrainingTask.Controllers
                 var projectDTO = _projectService.GetById(id.Value);
                 if(projectDTO != null)
                 {
-                    var projectModelView = projectMapper.Map(projectDTO);
+                    var projectModelView = _projectMapper.Map(projectDTO);
                     return View(projectModelView);
                 }
                 return NotFound();
@@ -84,7 +85,7 @@ namespace TrainingTask.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var projectDTO = projectMapper.Map(project);
+                    var projectDTO = _projectMapper.Map(project);
                     _projectService.Edit(projectDTO);
                 }
                 else
@@ -94,7 +95,7 @@ namespace TrainingTask.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var projectDTO = projectMapper.Map(project);
+                    var projectDTO = _projectMapper.Map(project);
                     _projectService.Add(projectDTO);
                 }
                 else
@@ -110,7 +111,7 @@ namespace TrainingTask.Controllers
                 var projectDTO = _projectService.GetById(id.Value);
                 if (projectDTO != null)
                 {
-                    var projectModelView = projectMapper.Map(projectDTO);
+                    var projectModelView = _projectMapper.Map(projectDTO);
                     return View(projectModelView);
                 }
             }
@@ -130,13 +131,13 @@ namespace TrainingTask.Controllers
             if(id != null)
             {
                 var projectDTO = _projectService.GetById(id.Value);
-                var projectModelView = projectMapper.Map(projectDTO);
+                var projectModelView = _projectMapper.Map(projectDTO);
                 var tasksDTO = _taskService.GetAllTasksByProjectId(id.Value);
                 projectModelView.Tasks = new List<TaskViewModel>();
 
                 foreach (var task in tasksDTO)
                 {
-                    var taskViewModel = taskMapper.Map(task);
+                    var taskViewModel = _taskMapper.Map(task);
                     projectModelView.Tasks.Add(taskViewModel);
                 }
 

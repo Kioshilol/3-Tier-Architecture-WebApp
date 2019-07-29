@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BLayer.DTO;
 using BLayer.Interfaces;
+using Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TrainingTask.Mapper;
@@ -15,17 +16,19 @@ namespace TrainingTask.Controllers
         private ITaskService<TaskDTO> _taskService;
         private IService<ProjectDTO> _projectService;
         private IService<EmployeeDTO> _employeeService;
-        private AutoTaskMapper taskMapper;
-        private AutoProjectMapper projectMapper;
-        private AutoEmployeeMapper employeeMapper;
-        public TaskController(ITaskService<TaskDTO> taskService, IService<ProjectDTO> projectService, IService<EmployeeDTO> employeeService)
+        private IMapper<TaskDTO, TaskViewModel> _taskMapper;
+        private IMapper<ProjectDTO, ProjectViewModel> _projectMapper;
+        private IMapper<EmployeeDTO, EmployeeViewModel> _employeeMapper;
+        public TaskController(ITaskService<TaskDTO> taskService, IService<ProjectDTO> projectService,
+            IService<EmployeeDTO> employeeService, IMapper<ProjectDTO, ProjectViewModel> projectMapper, IMapper<EmployeeDTO, EmployeeViewModel> employeeMapper,
+            IMapper<TaskDTO, TaskViewModel> taskMapper)
         {
             _projectService = projectService;
             _employeeService = employeeService;
             _taskService = taskService;
-            taskMapper = new AutoTaskMapper();
-            projectMapper = new AutoProjectMapper();
-            employeeMapper = new AutoEmployeeMapper();
+            _taskMapper = taskMapper;
+            _projectMapper = projectMapper;
+            _employeeMapper = employeeMapper;
         }
 
         public IActionResult Index(int page = 1)
@@ -35,7 +38,7 @@ namespace TrainingTask.Controllers
 
             foreach (var task in taskListPaging)
             {
-                var taskViewModel = taskMapper.Map(task);
+                var taskViewModel = _taskMapper.Map(task);
                 taskViewModel.Project = new ProjectViewModel();
                 tasksViewModelPaging.Add(taskViewModel);
             }
@@ -45,7 +48,7 @@ namespace TrainingTask.Controllers
 
             foreach(var task in taskList)
             {
-                var taskViewModel = taskMapper.Map(task);
+                var taskViewModel = _taskMapper.Map(task);
                 tasksViewModel.Add(taskViewModel);
             }
 
@@ -54,7 +57,7 @@ namespace TrainingTask.Controllers
 
             foreach (var project in projectsDTO)
             {
-                var projectViewModel = projectMapper.Map(project);
+                var projectViewModel = _projectMapper.Map(project);
                 projectsViewModel.Add(projectViewModel);
 
                 foreach (var task in tasksViewModelPaging)
@@ -91,7 +94,7 @@ namespace TrainingTask.Controllers
 
             foreach (var employee in employeeDTO)
             {
-                var employeeViewM = employeeMapper.Map(employee);
+                var employeeViewM = _employeeMapper.Map(employee);
                 employeeViewModel.Add(employeeViewM);
             }
 
@@ -101,7 +104,7 @@ namespace TrainingTask.Controllers
 
             foreach (var project in projectsDTO)
             {
-                var projectViewModel = projectMapper.Map(project);
+                var projectViewModel = _projectMapper.Map(project);
                 projectsViewModel.Add(projectViewModel);
             }
 
@@ -124,7 +127,7 @@ namespace TrainingTask.Controllers
 
             foreach (var employee in employeeDTO)
             {
-                var employeeViewM = employeeMapper.Map(employee);
+                var employeeViewM = _employeeMapper.Map(employee);
                 employeeViewModel.Add(employeeViewM);
             }
 
@@ -139,7 +142,7 @@ namespace TrainingTask.Controllers
             if (projectDto != null)
             {
                 model.ProjectId = projectid;
-                model.Project = projectMapper.Map(projectDto);
+                model.Project = _projectMapper.Map(projectDto);
 
                 return View(model);
             }
@@ -154,13 +157,13 @@ namespace TrainingTask.Controllers
 
             foreach (var employee in employeeDTO)
             {
-                var employeeViewM = employeeMapper.Map(employee);
+                var employeeViewM = _employeeMapper.Map(employee);
                 employeeViewModel.Add(employeeViewM);
             }
 
             if (ModelState.IsValid)
             {
-                var taskDTO = taskMapper.Map(task);
+                var taskDTO = _taskMapper.Map(task);
                 taskDTO.EmployeeId = selectedEmployee;
                 _taskService.Add(taskDTO);
                 return RedirectToAction("Index");
@@ -181,7 +184,7 @@ namespace TrainingTask.Controllers
 
                 foreach (var project in projectsDTO)
                 {
-                    var projectViewModel = projectMapper.Map(project);
+                    var projectViewModel = _projectMapper.Map(project);
                     projectsViewModel.Add(projectViewModel);
                 }
 
@@ -189,7 +192,7 @@ namespace TrainingTask.Controllers
                 ViewBag.Projects = projects;
                 var taskDTO = _taskService.GetById(id.Value);
                 taskDTO.DateOfEnd = DateTime.Now;
-                var taskModelView = taskMapper.Map(taskDTO);
+                var taskModelView = _taskMapper.Map(taskDTO);
                 return View(taskModelView);
             }
             return NotFound();
@@ -200,7 +203,7 @@ namespace TrainingTask.Controllers
         {
             if (ModelState.IsValid)
             {
-                var taskDTO = taskMapper.Map(task);
+                var taskDTO = _taskMapper.Map(task);
                 _taskService.Edit(taskDTO);
                 return RedirectToAction("Index");
             }
@@ -215,7 +218,7 @@ namespace TrainingTask.Controllers
                 var taskDTO = _taskService.GetById(id.Value);
                 if(taskDTO != null)
                 {
-                    var taskViewModel = taskMapper.Map(taskDTO);
+                    var taskViewModel = _taskMapper.Map(taskDTO);
                     return View(taskViewModel);
                 }
             }
@@ -236,7 +239,7 @@ namespace TrainingTask.Controllers
                 var taskDTO = _taskService.GetById(id.Value);
                 if(taskDTO != null)
                 {
-                    var taskModelView = taskMapper.Map(taskDTO);
+                    var taskModelView = _taskMapper.Map(taskDTO);
                     return View(taskModelView);
                 }
             }

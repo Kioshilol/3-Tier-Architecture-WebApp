@@ -1,5 +1,6 @@
 ﻿using BLayer.DTO;
 using Core.Interfaces;
+using DLayer.Entities;
 using TrainingTask.Models;
 
 namespace TrainingTask.Mapper
@@ -30,4 +31,6 @@ namespace TrainingTask.Mapper
             };
         }
     }
+
+
 }
