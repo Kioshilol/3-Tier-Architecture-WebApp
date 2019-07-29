@@ -1,12 +1,13 @@
 ﻿using Core.Interfaces;
-using DLayer.EF.EfEntities;
+using DLayer.EFContext.EfEntities;
 using DLayer.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
-namespace DLayer.EF.EfRepositories
+namespace DLayer.EFContext.EfRepositories
 {
     public class EfProjectRepository :BaseRepository<Project>, IRepository<Project>
     {
@@ -17,12 +18,12 @@ namespace DLayer.EF.EfRepositories
         }
         public void Delete(int id)
         {
-            Remove(_dbContext, _dbContext.Project.Find(id));
+            RemoveObject(_dbContext, _dbContext.Project.Find(id));
         }
 
         public void Edit(Project entity)
         {
-            Update(_dbContext, entity);
+            UpdateObject(_dbContext, entity);
         }
 
         public IEnumerable<Project> GetAll()
@@ -30,10 +31,17 @@ namespace DLayer.EF.EfRepositories
             return _dbContext.Project;
         }
 
-        public IEnumerable<Project> GetAllWithPaging(int PageNumber)
+        public IEnumerable<Project> GetAllWithPaging(int pageNumber)
         {
-
-            return _dbContext.Project;
+            if (pageNumber < 1)
+            {
+                throw new Exception("Wrong pageNumber");
+            }
+            else
+            {
+                int pageSize = AppSetting.GetPageSize();
+                return _dbContext.Project.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+            }
         }
 
         public Project GetById(int id)

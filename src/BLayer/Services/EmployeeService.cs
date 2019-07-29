@@ -3,7 +3,7 @@ using BLayer.Interfaces;
 using BLayer.Mapper;
 using Core.Interfaces;
 using DLayer;
-using DLayer.EF.EfEntities;
+using DLayer.EFContext.EfEntities;
 using DLayer.Entities;
 using DLayer.Interfaces;
 using System.Collections.Generic;

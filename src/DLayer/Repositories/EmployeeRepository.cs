@@ -57,20 +57,20 @@ namespace DLayer.Repositories
 
         private Func<SqlDataReader, IList<Employee>> listsMapper = (sqlDataReader) =>
         {
-            List<Employee> staffList = new List<Employee>();
+            List<Employee> employeeList = new List<Employee>();
 
             while (sqlDataReader.Read())
             {
-                Employee staff = new Employee();
-                staff.Id = Convert.ToInt32(sqlDataReader["Id"]);
-                staff.Name = sqlDataReader["Name"].ToString();
-                staff.Surname = sqlDataReader["Surname"].ToString();
-                staff.SecondName = sqlDataReader["SecondName"].ToString();
-                staff.Position = sqlDataReader["Position"].ToString();
-                staffList.Add(staff);
+                Employee employee = new Employee();
+                employee.Id = Convert.ToInt32(sqlDataReader["Id"]);
+                employee.Name = sqlDataReader["Name"].ToString();
+                employee.Surname = sqlDataReader["Surname"].ToString();
+                employee.SecondName = sqlDataReader["SecondName"].ToString();
+                employee.Position = sqlDataReader["Position"].ToString();
+                employeeList.Add(employee);
             }
 
-            return staffList;
+            return employeeList;
         };
 
         private List<SqlParameter> AddParameters(Employee entity)

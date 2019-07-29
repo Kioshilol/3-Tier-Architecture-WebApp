@@ -9,7 +9,6 @@ namespace DLayer.Entities
         public string Name { get; set; }
         public string SecondName { get; set; }
         public string Position { get; set; }
-        public ICollection<Task> TaskList { get; set; }
-        public ICollection<EmployeeTasks> StaffTasks { get; set; }
+        public ICollection<EmployeeTasks> EmployeeTasks { get; set; }
     }
 }

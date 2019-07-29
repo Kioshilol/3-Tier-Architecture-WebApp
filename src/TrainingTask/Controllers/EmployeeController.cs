@@ -12,43 +12,43 @@ namespace TrainingTask.Controllers
     public class EmployeeController : Controller
     {
         private IService<EmployeeDTO> _employeeService;
-        private EmployeeMapper _employeeMapper;
+        private AutoEmployeeMapper _employeeMapper;
         public EmployeeController(IService<EmployeeDTO> employeeService)
         {
             _employeeService = employeeService;
-            _employeeMapper = new EmployeeMapper();
+            _employeeMapper = new AutoEmployeeMapper();
         }
         [HttpGet()]
         public IActionResult Index(int page = 1)
         {
-            var staffViewModelListPaging = new List<EmployeeViewModel>();
-            var staffListPaging = _employeeService.GetAllWithPaging(page);
-            var staffViewModelList = new List<EmployeeViewModel>();
-            var staffList = _employeeService.GetAll();
+            var employeeViewModelListPaging = new List<EmployeeViewModel>();
+            var employeeListPaging = _employeeService.GetAllWithPaging(page);
+            var employeeViewModelList = new List<EmployeeViewModel>();
+            var employeeList = _employeeService.GetAll();
 
-            foreach(var employee in staffList)
+            foreach(var employee in employeeList)
             {
                 var employeeDTO = _employeeMapper.Map(employee);
-                staffViewModelList.Add(employeeDTO);
+                employeeViewModelList.Add(employeeDTO);
             }
 
-            foreach (var employee in staffListPaging)
+            foreach (var employee in employeeListPaging)
             {
                 var employeeDTO = _employeeMapper.Map(employee);
-                staffViewModelListPaging.Add(employeeDTO);
+                employeeViewModelListPaging.Add(employeeDTO);
             }
 
             var pageViewModel = new PageViewModel
             {
                 PageNumber = page,
                 RowsPerPage = PageSetting.GetRowsPerPage(),
-                TotalRecords = staffViewModelList.Count,
-                TotalPages = staffViewModelList.Count / PageSetting.GetRowsPerPage()
+                TotalRecords = employeeViewModelList.Count,
+                TotalPages = employeeViewModelList.Count / PageSetting.GetRowsPerPage()
             };
 
             var indexViewModel = new IndexViewModel<EmployeeViewModel>
             {
-                ViewModelList = staffViewModelListPaging,
+                ViewModelList = employeeViewModelListPaging,
                 Page = pageViewModel
             };
 
@@ -60,8 +60,12 @@ namespace TrainingTask.Controllers
             if (id.HasValue)
             {
                 var employeeDTO = _employeeService.GetById(id.Value);
-                var staffModelView = _employeeMapper.Map(employeeDTO);
-                return View(staffModelView);
+                if(employeeDTO != null)
+                {
+                    var employeeDTOList = _employeeMapper.Map(employeeDTO);
+                    return View(employeeDTOList);
+                }
+                return NotFound();
             }
             else
             {
@@ -74,36 +78,64 @@ namespace TrainingTask.Controllers
         {
             if (employee.Id.HasValue)
             {
-                var staffDTO = _employeeMapper.Map(employee);
-                _employeeService.Edit(staffDTO);
+                if (ModelState.IsValid)
+                {
+                    var employeeDTO = _employeeMapper.Map(employee);
+                    _employeeService.Edit(employeeDTO);
+                }
+                else
+                    return View(employee);
             }
             else
             {
-                var staffDTO = _employeeMapper.Map(employee);
-                _employeeService.Add(staffDTO);
+                if (ModelState.IsValid)
+                {
+                    var employeeDTO = _employeeMapper.Map(employee);
+                    _employeeService.Add(employeeDTO);
+                }
+                else
+                    return View(employee);
             }
             return RedirectToAction("Index");
         }
 
-        public IActionResult Delete(int id)
+        public IActionResult Delete(int? id)
         {
-            var employee = _employeeService.GetById(id);
-            var StaffViewModel = _employeeMapper.Map(employee);
-            return View(StaffViewModel);
+            if(id != null) 
+            {
+                var employeeDTO = _employeeService.GetById(id.Value);
+                if (employeeDTO != null)
+                {
+                    var employeeViewModel = _employeeMapper.Map(employeeDTO);
+                    return View(employeeViewModel);
+                }
+            }
+            return NotFound();
         }
 
         [HttpPost, ActionName("Delete")]
-        public IActionResult DeleteConfirmed(int id)
+        public IActionResult DeleteConfirmed(int? id)
         {
-            _employeeService.Delete(id);
-            return RedirectToAction("Index");
+            if (id != null)
+            {
+                _employeeService.Delete(id.Value);
+                return RedirectToAction("Index");
+            }
+            return NotFound();
         }
 
-        public IActionResult Details(int id)
+        public IActionResult Details(int? id)
         {
-            var staffDTO = _employeeService.GetById(id);
-            var staffModelView = _employeeMapper.Map(staffDTO);
-            return View(staffModelView);
+            if (id != null)
+            {
+                var employeeDTO = _employeeService.GetById(id.Value);
+                if (employeeDTO != null)
+                {
+                    var employeeViewModel = _employeeMapper.Map(employeeDTO);
+                    return View(employeeViewModel);
+                }
+            }
+            return NotFound();
         }
     }
 }

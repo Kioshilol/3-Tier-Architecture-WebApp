@@ -16,6 +16,6 @@ namespace BLayer.DTO
         public Status TypeStatus { get; set; }
         public ProjectDTO Project { get; set; }
         public int? ProjectId { get; set; }
-        public int[] StaffId { get; set; }
+        public int[] EmployeeId { get; set; }
     }
 }

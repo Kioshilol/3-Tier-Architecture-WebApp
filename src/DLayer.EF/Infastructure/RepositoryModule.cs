@@ -1,11 +1,11 @@
 ﻿using Core.Interfaces;
-using DLayer.EF.EfEntities;
-using DLayer.EF.EfRepositories;
+using DLayer.EFContext.EfEntities;
+using DLayer.EFContext.EfRepositories;
 using DLayer.Entities;
 using DLayer.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DLayer.EF
+namespace DLayer.EFContext
 {
     public static class RepositoryModule
     {

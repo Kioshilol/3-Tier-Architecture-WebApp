@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using BLayer.DTO;
 using BLayer.Interfaces;
-using BLayer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TrainingTask.Mapper;
-using TrainingTask.Mapping;
 using TrainingTask.Models;
 using TrainingTask.ViewModels;
 
@@ -17,30 +15,21 @@ namespace TrainingTask.Controllers
         private ITaskService<TaskDTO> _taskService;
         private IService<ProjectDTO> _projectService;
         private IService<EmployeeDTO> _employeeService;
-        private TaskMapper taskMapper;
-        private ProjectMapper projectMapper;
-        private EmployeeMapper employeeMapper;
+        private AutoTaskMapper taskMapper;
+        private AutoProjectMapper projectMapper;
+        private AutoEmployeeMapper employeeMapper;
         public TaskController(ITaskService<TaskDTO> taskService, IService<ProjectDTO> projectService, IService<EmployeeDTO> employeeService)
         {
             _projectService = projectService;
             _employeeService = employeeService;
             _taskService = taskService;
-            taskMapper = new TaskMapper();
-            projectMapper = new ProjectMapper();
-            employeeMapper = new EmployeeMapper();
+            taskMapper = new AutoTaskMapper();
+            projectMapper = new AutoProjectMapper();
+            employeeMapper = new AutoEmployeeMapper();
         }
 
         public IActionResult Index(int page = 1)
         {
-            var projectsDTO = _projectService.GetAll();
-            var projectsViewModel = new List<ProjectViewModel>();
-
-            foreach (var project in projectsDTO)
-            {
-                var projectViewModel = projectMapper.Map(project);
-                projectsViewModel.Add(projectViewModel);
-            }
-
             var tasksViewModelPaging = new List<TaskViewModel>();
             var taskListPaging = _taskService.GetAllWithPaging(page);
 
@@ -60,13 +49,19 @@ namespace TrainingTask.Controllers
                 tasksViewModel.Add(taskViewModel);
             }
 
-            foreach (var project in projectsViewModel)
+            var projectsDTO = _projectService.GetAll();
+            var projectsViewModel = new List<ProjectViewModel>();
+
+            foreach (var project in projectsDTO)
             {
-                foreach(var task in tasksViewModelPaging)
+                var projectViewModel = projectMapper.Map(project);
+                projectsViewModel.Add(projectViewModel);
+
+                foreach (var task in tasksViewModelPaging)
                 {
-                    if(task.ProjectId == project.Id)
+                    if(task.ProjectId == projectViewModel.Id)
                     {
-                        task.Project = project;
+                        task.Project = projectViewModel;
                     }
                 }
             }
@@ -94,9 +89,9 @@ namespace TrainingTask.Controllers
             var employeeDTO = _employeeService.GetAll();
             var employeeViewModel = new List<EmployeeViewModel>();
 
-            foreach (var staff in employeeDTO)
+            foreach (var employee in employeeDTO)
             {
-                var employeeViewM = employeeMapper.Map(staff);
+                var employeeViewM = employeeMapper.Map(employee);
                 employeeViewModel.Add(employeeViewM);
             }
 
@@ -127,9 +122,9 @@ namespace TrainingTask.Controllers
             var employeeDTO = _employeeService.GetAll();
             var employeeViewModel = new List<EmployeeViewModel>();
 
-            foreach (var staff in employeeDTO)
+            foreach (var employee in employeeDTO)
             {
-                var employeeViewM = employeeMapper.Map(staff);
+                var employeeViewM = employeeMapper.Map(employee);
                 employeeViewModel.Add(employeeViewM);
             }
 
@@ -152,54 +147,79 @@ namespace TrainingTask.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(TaskViewModel task, int[] selectedStaff)
+        public IActionResult Create(TaskViewModel task, int[] selectedEmployee)
         {
             var employeeDTO = _employeeService.GetAll();
             var employeeViewModel = new List<EmployeeViewModel>();
 
-            foreach (var staff in employeeDTO)
+            foreach (var employee in employeeDTO)
             {
-                var employeeViewM = employeeMapper.Map(staff);
+                var employeeViewM = employeeMapper.Map(employee);
                 employeeViewModel.Add(employeeViewM);
             }
 
-            var taskDTO = taskMapper.Map(task);
-            taskDTO.StaffId = selectedStaff;
-            _taskService.Add(taskDTO);
-            return RedirectToAction("Index");
-        }
-        public IActionResult Edit(int id)
-        {
-            var projectsDTO = _projectService.GetAll();
-            var projectsViewModel = new List<ProjectViewModel>();
-
-            foreach (var project in projectsDTO)
+            if (ModelState.IsValid)
             {
-                var projectViewModel = projectMapper.Map(project);
-                projectsViewModel.Add(projectViewModel);
+                var taskDTO = taskMapper.Map(task);
+                taskDTO.EmployeeId = selectedEmployee;
+                _taskService.Add(taskDTO);
+                return RedirectToAction("Index");
             }
 
-            SelectList projects = new SelectList(projectsViewModel, "Id", "Name");
-            ViewBag.Projects = projects;
-            var taskDTO = _taskService.GetById(id);
-            taskDTO.DateOfEnd = DateTime.Now;
-            var taskModelView = taskMapper.Map(taskDTO);
-            return View(taskModelView);
+            else
+            {
+                ViewBag.employee = employeeViewModel;
+                return View(task);
+            }
+        }
+        public IActionResult Edit(int? id)
+        {
+            if (id != null)
+            {
+                var projectsDTO = _projectService.GetAll();
+                var projectsViewModel = new List<ProjectViewModel>();
+
+                foreach (var project in projectsDTO)
+                {
+                    var projectViewModel = projectMapper.Map(project);
+                    projectsViewModel.Add(projectViewModel);
+                }
+
+                SelectList projects = new SelectList(projectsViewModel, "Id", "Name");
+                ViewBag.Projects = projects;
+                var taskDTO = _taskService.GetById(id.Value);
+                taskDTO.DateOfEnd = DateTime.Now;
+                var taskModelView = taskMapper.Map(taskDTO);
+                return View(taskModelView);
+            }
+            return NotFound();
         }
 
         [HttpPost]
         public IActionResult Edit(TaskViewModel task)
         {
-            var taskDTO = taskMapper.Map(task);
-            _taskService.Edit(taskDTO);
-            return RedirectToAction("Index");
+            if (ModelState.IsValid)
+            {
+                var taskDTO = taskMapper.Map(task);
+                _taskService.Edit(taskDTO);
+                return RedirectToAction("Index");
+            }
+            else
+                return View(task);
         }
 
-        public IActionResult Delete(int id)
+        public IActionResult Delete(int? id)
         {
-            var task = _taskService.GetById(id);
-            var taskViewModel = taskMapper.Map(task);
-            return View(taskViewModel);
+            if(id != null)
+            {
+                var taskDTO = _taskService.GetById(id.Value);
+                if(taskDTO != null)
+                {
+                    var taskViewModel = taskMapper.Map(taskDTO);
+                    return View(taskViewModel);
+                }
+            }
+            return NotFound();
         }
 
         [HttpPost, ActionName("Delete")]
@@ -209,11 +229,19 @@ namespace TrainingTask.Controllers
             return RedirectToAction("Index");
         }
 
-        public IActionResult Details(int id)
+        public IActionResult Details(int? id)
         {
-            var taskDTO = _taskService.GetById(id);
-            var taskModelView = taskMapper.Map(taskDTO);
-            return View(taskModelView);
+            if(id != null)
+            {
+                var taskDTO = _taskService.GetById(id.Value);
+                if(taskDTO != null)
+                {
+                    var taskModelView = taskMapper.Map(taskDTO);
+                    return View(taskModelView);
+                }
+            }
+
+            return NotFound();
         }
     }
 }

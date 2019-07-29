@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using AutoMapper;
 using BLayer.DTO;
 using BLayer.Interfaces;
-using BLayer.Services;
 using Microsoft.AspNetCore.Mvc;
 using TrainingTask.Mapper;
-using TrainingTask.Mapping;
 using TrainingTask.Models;
 using TrainingTask.ViewModels;
 
@@ -15,14 +14,14 @@ namespace TrainingTask.Controllers
     {
         private IService<ProjectDTO> _projectService;
         private ITaskService<TaskDTO> _taskService;
-        private ProjectMapper projectMapper;
-        private TaskMapper taskMapper;
+        private AutoProjectMapper projectMapper;
+        private AutoTaskMapper taskMapper;
         public ProjectController(IService<ProjectDTO> projectService, ITaskService<TaskDTO> taskService)
         {
             _projectService = projectService;
             _taskService = taskService;
-            projectMapper = new ProjectMapper();
-            taskMapper = new TaskMapper();
+            projectMapper = new AutoProjectMapper();
+            taskMapper = new AutoTaskMapper();
         }
         public IActionResult Index(int page = 1)
         {
@@ -65,8 +64,12 @@ namespace TrainingTask.Controllers
             if (id.HasValue)
             {
                 var projectDTO = _projectService.GetById(id.Value);
-                var projectModelView = projectMapper.Map(projectDTO);
-                return View(projectModelView);
+                if(projectDTO != null)
+                {
+                    var projectModelView = projectMapper.Map(projectDTO);
+                    return View(projectModelView);
+                }
+                return NotFound();
             }
             else
             {
@@ -79,22 +82,39 @@ namespace TrainingTask.Controllers
         {
             if (project.Id.HasValue)
             {
-                var projectDTO = projectMapper.Map(project);
-                _projectService.Edit(projectDTO);
+                if (ModelState.IsValid)
+                {
+                    var projectDTO = projectMapper.Map(project);
+                    _projectService.Edit(projectDTO);
+                }
+                else
+                    return View(project);
             }
             else
             {
-                var projectDTO = projectMapper.Map(project);
-                _projectService.Add(projectDTO);
+                if (ModelState.IsValid)
+                {
+                    var projectDTO = projectMapper.Map(project);
+                    _projectService.Add(projectDTO);
+                }
+                else
+                    return View(project);
             }
             return RedirectToAction("Index");
         }
 
-        public IActionResult Delete(int id)
+        public IActionResult Delete(int? id)
         {
-            var projectDTO = _projectService.GetById(id);
-            var projectModelView = projectMapper.Map(projectDTO);
-            return View(projectModelView);
+            if(id != null)
+            {
+                var projectDTO = _projectService.GetById(id.Value);
+                if (projectDTO != null)
+                {
+                    var projectModelView = projectMapper.Map(projectDTO);
+                    return View(projectModelView);
+                }
+            }
+            return NotFound();
         }
 
         [HttpPost, ActionName("Delete")]
@@ -105,20 +125,25 @@ namespace TrainingTask.Controllers
         }
 
         [Route("projects/{id}")]
-        public IActionResult Details(int id)
+        public IActionResult Details(int? id)
         {
-            var projectDTO = _projectService.GetById(id);
-            var projectModelView = projectMapper.Map(projectDTO);
-            var tasksDTO = _taskService.GetAllTasksByProjectId(id);
-            projectModelView.Tasks = new List<TaskViewModel>();
-
-            foreach(var task in tasksDTO)
+            if(id != null)
             {
-                var taskViewModel = taskMapper.Map(task);
-                projectModelView.Tasks.Add(taskViewModel);
+                var projectDTO = _projectService.GetById(id.Value);
+                var projectModelView = projectMapper.Map(projectDTO);
+                var tasksDTO = _taskService.GetAllTasksByProjectId(id.Value);
+                projectModelView.Tasks = new List<TaskViewModel>();
+
+                foreach (var task in tasksDTO)
+                {
+                    var taskViewModel = taskMapper.Map(task);
+                    projectModelView.Tasks.Add(taskViewModel);
+                }
+
+                TempData["ProjectId"] = projectModelView.Id;
+                return View(projectModelView);
             }
-            TempData["ProjectId"] = projectModelView.Id;
-            return View(projectModelView);
+            return NotFound();
         }
 
         public IActionResult Privacy()

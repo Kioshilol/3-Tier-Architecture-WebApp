@@ -10,7 +10,7 @@ namespace BLayer.Mapper
         {
             return new Employee()
             {
-                Id = item.Id.Value,
+                Id = item.Id,
                 Name = item.Name,
                 Surname = item.Surname,
                 SecondName = item.SecondName,
@@ -22,7 +22,7 @@ namespace BLayer.Mapper
         {
             return new EmployeeDTO()
             {
-                Id = item.Id.Value,
+                Id = item.Id,
                 Name = item.Name,
                 Surname = item.Surname,
                 SecondName = item.SecondName,

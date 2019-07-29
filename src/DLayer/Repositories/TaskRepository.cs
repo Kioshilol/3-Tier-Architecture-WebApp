@@ -54,7 +54,7 @@ namespace DLayer.Repositories
             string storedProcedure = "spAddTasksStaff";
             int taskId = ExecuteReader<int>(sp, parametersList, _connection, idMapper);
 
-            foreach(var item in entity.StaffId)
+            foreach(var item in entity.EmployeeId)
             {
                 List<SqlParameter> parameters = new List<SqlParameter>();
                 parameters.Add(new SqlParameter("@StaffId", item));

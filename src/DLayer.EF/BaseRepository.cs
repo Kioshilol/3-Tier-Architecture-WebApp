@@ -1,14 +1,11 @@
-﻿using DLayer.EF.EfEntities;
+﻿using DLayer.EFContext.EfEntities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace DLayer.EF
+namespace DLayer.EFContext
 {
     public abstract class BaseRepository<T>
     {
-        protected void Remove(TrainingTaskContext dbContext,T entity)
+        protected void RemoveObject(TrainingTaskContext dbContext,T entity)
         {
             T nameOfClass = entity;
             if (nameOfClass != null)
@@ -16,7 +13,7 @@ namespace DLayer.EF
             dbContext.SaveChanges();
         }
 
-        protected void Update(TrainingTaskContext dbContext, T entity)
+        protected void UpdateObject(TrainingTaskContext dbContext, T entity)
         {
             dbContext.Entry(entity).State = EntityState.Modified;
             dbContext.SaveChanges();

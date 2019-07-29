@@ -17,7 +17,7 @@ namespace BLayer.Mapper
                 DateOfEnd = item.DateOfEnd,
                 TypeStatus = item.TypeStatus,
                 ProjectId = item.ProjectId.Value,
-                StaffId = item.StaffId
+                EmployeeId = item.EmployeeId
             };
         }
 
@@ -32,7 +32,7 @@ namespace BLayer.Mapper
                 DateOfEnd = item.DateOfEnd,
                 TypeStatus = item.TypeStatus,
                 ProjectId = item.ProjectId,
-                StaffId = item.StaffId
+                EmployeeId = item.EmployeeId
             };
         }
     }

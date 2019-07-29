@@ -1,8 +1,6 @@
 ﻿using Core.Interfaces;
 using DLayer.Entities;
 using DLayer.Interfaces;
-using DLayer.Repositories;
-using System.Data.SqlClient;
 
 namespace DLayer
 {

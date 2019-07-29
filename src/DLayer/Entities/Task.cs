@@ -1,10 +1,7 @@
 ﻿using Core.Enum;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Linq.Mapping;
-using System.Text;
 
 namespace DLayer.Entities
 {
@@ -18,8 +15,8 @@ namespace DLayer.Entities
         public  Status TypeStatus { get; set; }
         public Project Project { get; set; }
         [NotMapped]
-        public int[] StaffId { get; set; }
-        public ICollection<EmployeeTasks> StaffTasks { get; set; }
+        public int[] EmployeeId { get; set; }
+        public ICollection<EmployeeTasks> EmployeeTasks { get; set; }
         public int? ProjectId { get; set; }
     }
 }

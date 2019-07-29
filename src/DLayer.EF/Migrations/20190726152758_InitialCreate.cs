@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace DLayer.EF.Migrations
+namespace DLayer.EFContext.Migrations
 {
     public partial class InitialCreate : Migration
     {
