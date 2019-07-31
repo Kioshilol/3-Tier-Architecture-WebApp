@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using DLayer.Entities;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using TrainingTask.ViewModels;
 
 namespace TrainingTask.Models
 {
@@ -13,6 +16,6 @@ namespace TrainingTask.Models
         public string SecondName { get; set; }
         [Required]
         public string Position { get; set; }
-        public IEnumerable<EmployeeViewModel> Staff { get; set; }
+        public IEnumerable<EmployeeTasksViewModel> EmployeeTasks { get; set; }
     }
 }

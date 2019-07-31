@@ -1,9 +1,6 @@
 ﻿using BLayer.DTO;
 using BLayer.Interfaces;
-using BLayer.Mapper;
-using BLayer.Mapping;
 using Core.Interfaces;
-using DLayer;
 using DLayer.Entities;
 using DLayer.Interfaces;
 using System.Collections.Generic;
@@ -12,37 +9,37 @@ namespace BLayer.Services
 {
     public class ProjectService : BaseService<Project,ProjectDTO>, IService<ProjectDTO>
     {
-        IUnitOfWork _DataBase { get; set; }
-        private IMapper<Project, ProjectDTO> projectMapper;
-        private IMapper<Task, TaskDTO> taskMapper;
-        public ProjectService(IUnitOfWork dataBase)
+        private IUnitOfWork _DataBase { get; set; }
+        private IMapper<Project, ProjectDTO> _projectMapper;
+        private IMapper<Task, TaskDTO> _taskMapper;
+        public ProjectService(IUnitOfWork dataBase, IMapper<Task, TaskDTO> taskMapper, IMapper<Project, ProjectDTO> projectMapper)
         {
             _DataBase = dataBase;
-            projectMapper = new ProjectMapper();
-            taskMapper = new TaskMapper();
+            _projectMapper = projectMapper;
+            _taskMapper = taskMapper;
         }
 
         public ProjectDTO GetById(int id)
         {
             var project = _DataBase.Projects.GetById(id);
-            return this.projectMapper.Map(project);            
+            return this._projectMapper.Map(project);            
         }
 
         public IEnumerable<ProjectDTO> GetAll()
         {
 
-            return GetPaging(projectMapper, _DataBase.Projects.GetAll()); ;
+            return GetPaging(_projectMapper, _DataBase.Projects.GetAll()); ;
         }
 
         public int Add(ProjectDTO entity)
         {
-            var project = projectMapper.Map(entity);
+            var project = _projectMapper.Map(entity);
             return _DataBase.Projects.Insert(project);
         }
 
         public void Edit(ProjectDTO entity)
         {
-            var project = projectMapper.Map(entity);
+            var project = _projectMapper.Map(entity);
             _DataBase.Projects.Edit(project);
         }
 
@@ -53,7 +50,7 @@ namespace BLayer.Services
 
         public IEnumerable<ProjectDTO> GetAllWithPaging(int pageNumber)
         {
-            return GetPaging(projectMapper, _DataBase.Projects.GetAllWithPaging(pageNumber));
+            return GetPaging(_projectMapper, _DataBase.Projects.GetAllWithPaging(pageNumber));
         }
     }
 }

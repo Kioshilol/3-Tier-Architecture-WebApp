@@ -1,6 +1,8 @@
 ﻿using BLayer.DTO;
 using BLayer.Interfaces;
-using BLayer.Mapper;
+using BLayer.Mappers;
+using BLayer.Mappers;
+using BLayer.Mappers.AutoMappers;
 using Core.Interfaces;
 using DLayer.Entities;
 using DLayer.Interfaces;
@@ -12,23 +14,23 @@ namespace BLayer.Services
     public class TaskService :BaseService<Task,TaskDTO>, ITaskService<TaskDTO>
     {
         private IUnitOfWork _DataBase { get; set; }
-        private IMapper<Task, TaskDTO> taskMapper;
+        private IMapper<Task, TaskDTO> _taskMapper;
 
-        public TaskService(IUnitOfWork dataBase)
+        public TaskService(IUnitOfWork dataBase, IMapper<Task, TaskDTO> taskMapper)
         {
             _DataBase = dataBase;
-            taskMapper = new TaskMapper();
+            _taskMapper = taskMapper;
         }
         public int Add(TaskDTO entity)
         {
             entity.DateOfStart = DateTime.UtcNow;
-            TimeSpan timeOfTask = entity.DateOfEnd.Subtract(entity.DateOfStart);
+            TimeSpan timeOfTask = entity.DateOfEnd - entity.DateOfStart;
             long timeOfTaskDays = timeOfTask.Days;
             if (timeOfTaskDays < 1)
                 throw new Exception("Wrong Number(less than 1)");
             else
                 entity.TaskTime = timeOfTaskDays;
-            var task = taskMapper.Map(entity);
+            var task = _taskMapper.Map(entity);
             return _DataBase.Task.Insert(task);
         }
 
@@ -39,29 +41,30 @@ namespace BLayer.Services
 
         public void Edit(TaskDTO entity)
         {
-            var task = taskMapper.Map(entity);
+            var task = _taskMapper.Map(entity);
             _DataBase.Task.Edit(task);
         }
 
         public IEnumerable<TaskDTO> GetAllWithPaging(int pageNumber)
         {
-            return GetPaging(taskMapper, _DataBase.Task.GetAllWithPaging(pageNumber));
+            return GetPaging(_taskMapper, _DataBase.Task.GetAllWithPaging(pageNumber));
         }
 
         public TaskDTO GetById(int id)
         {
             var task = _DataBase.Task.GetById(id);
-            return taskMapper.Map(task);
+            return _taskMapper.Map(task);
         }
 
         public IEnumerable<TaskDTO> GetAllTasksByProjectId(int id)
         {
-            return GetPaging(taskMapper, _DataBase.Task.GetAllTasksByProjectId(id));
+            return GetPaging(_taskMapper, _DataBase.Task.GetAllTasksByProjectId(id));
         }
 
         public IEnumerable<TaskDTO> GetAll()
         {
-            return GetPaging(taskMapper, _DataBase.Task.GetAll());
+            var list = GetPaging(_taskMapper, _DataBase.Task.GetAll());
+            return GetPaging(_taskMapper, _DataBase.Task.GetAll());
         }
     }
 }

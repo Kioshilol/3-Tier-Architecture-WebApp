@@ -1,5 +1,6 @@
 ﻿using DLayer.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace DLayer.EFContext.EfEntities
 {
@@ -54,12 +55,14 @@ namespace DLayer.EFContext.EfEntities
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.EmployeeTasks)
                     .HasForeignKey(d => d.EmployeeId)
-                    .HasConstraintName("FK_StaffTasks_Staff");
+                    .HasConstraintName("FK_StaffTasks_Staff")
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(d => d.Task)
                     .WithMany(p => p.EmployeeTasks)
                     .HasForeignKey(d => d.TaskId)
-                    .HasConstraintName("FK_StaffTasks_Task");
+                    .HasConstraintName("FK_StaffTasks_Task")
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Task>(entity =>
@@ -77,7 +80,8 @@ namespace DLayer.EFContext.EfEntities
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.Task)
                     .HasForeignKey(d => d.ProjectId)
-                    .HasConstraintName("FK_Task_Project");
+                    .HasConstraintName("FK_Task_Project")
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

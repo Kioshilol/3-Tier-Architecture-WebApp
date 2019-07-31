@@ -1,16 +1,17 @@
 ﻿using BLayer.DTO;
 using Core.Interfaces;
 using DLayer.Entities;
+using TrainingTask.Models;
 
-namespace BLayer.Mappers
+namespace TrainingTask.Mapper
 {
-    public class EmployeeMapper : IMapper<Employee, EmployeeDTO>
+    public class EmployeeMapper : IMapper<EmployeeDTO, EmployeeViewModel>
     {
-        public Employee Map(EmployeeDTO item)
+        public EmployeeDTO Map(EmployeeViewModel item)
         {
-            return new Employee()
+            return new EmployeeDTO()
             {
-                Id = item.Id,
+                Id = item.Id.Value,
                 Name = item.Name,
                 Surname = item.Surname,
                 SecondName = item.SecondName,
@@ -18,11 +19,11 @@ namespace BLayer.Mappers
             };
         }
 
-        public EmployeeDTO Map(Employee item)
+        public EmployeeViewModel Map(EmployeeDTO item)
         {
-            return new EmployeeDTO()
+            return new EmployeeViewModel()
             {
-                Id = item.Id,
+                Id = item.Id.Value,
                 Name = item.Name,
                 Surname = item.Surname,
                 SecondName = item.SecondName,
@@ -30,4 +31,6 @@ namespace BLayer.Mappers
             };
         }
     }
+
+
 }

@@ -1,8 +1,7 @@
 ﻿using Core.Enum;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BLayer.DTO
 {
@@ -17,5 +16,7 @@ namespace BLayer.DTO
         public ProjectDTO Project { get; set; }
         public int? ProjectId { get; set; }
         public int[] EmployeeId { get; set; }
+        [NotMapped]
+        public ICollection<EmployeeTasksDTO> EmployeeTasks { get; set; }
     }
 }

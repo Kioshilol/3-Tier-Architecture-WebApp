@@ -1,28 +1,16 @@
 ﻿using BLayer.DTO;
 using Core.Interfaces;
-using DLayer.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using TrainingTask.Models;
 
-namespace BLayer.Mappers
+namespace TrainingTask.Mapper
 {
-    public class TaskMapper : IMapper<Task,TaskDTO>
+    public class TaskMapper : IMapper<TaskDTO, TaskViewModel>
     {
-        public Task Map(TaskDTO item)
-        {
-            return new Task()
-            {
-                Id = item.Id,
-                Name = item.Name,
-                TaskTime = item.TaskTime,
-                DateOfStart = item.DateOfStart,
-                DateOfEnd = item.DateOfEnd,
-                TypeStatus = item.TypeStatus,
-                ProjectId = item.ProjectId.Value,
-                EmployeeId = item.EmployeeId,
-                //EmployeeTasks = item.EmployeeTasks
-            };
-        }
-
-        public TaskDTO Map(Task item)
+        public TaskDTO Map(TaskViewModel item)
         {
             return new TaskDTO()
             {
@@ -32,9 +20,21 @@ namespace BLayer.Mappers
                 DateOfStart = item.DateOfStart,
                 DateOfEnd = item.DateOfEnd,
                 TypeStatus = item.TypeStatus,
-                ProjectId = item.ProjectId,
-                EmployeeId = item.EmployeeId,
-               // EmployeeTasks = item.EmployeeTasks
+                ProjectId = item.ProjectId.Value
+            };
+        }
+
+        public TaskViewModel Map(TaskDTO item)
+        {
+            return new TaskViewModel()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                TaskTime = item.TaskTime,
+                DateOfStart = item.DateOfStart,
+                DateOfEnd = item.DateOfEnd,
+                TypeStatus = item.TypeStatus,
+                ProjectId = item.ProjectId
             };
         }
     }

@@ -32,6 +32,29 @@
                 <span asp-validation-for="DateOfStart" class="text-danger"></span>
             </div>
             <div class="form-group">
+                @if (Model.EmployeeTasks.Count != 0)
+                {
+                        List<EmployeeViewModel> employees = new List<EmployeeViewModel>();
+                        foreach (var task in Model.EmployeeTasks)
+                        {
+                            employees.Add(task.Employee);
+                        }
+
+                        @foreach (var employee in ViewBag.Employee)
+                        {
+                            <input type="checkbox" name="selectedEmployee" value="@employee.Id" 
+                                   @(employees.Contains(employee) ? "checked=\"checked\"" : "") />@employee.Name <br />
+                        }
+                }
+                else
+                {
+                    @foreach (var employee in ViewBag.Employee)
+                    {
+                        <input type="checkbox" name="selectedEmployee" value="@employee.Id") />@employee.Name <br />
+                    }
+                }
+            </div>
+            <div class="form-group">
                 <label asp-for="DateOfEnd" class="control-label"></label>
                 <input asp-for="DateOfEnd" class="form-control" />
                 <span asp-validation-for="DateOfEnd" class="text-danger"></span>

@@ -14,9 +14,9 @@ namespace DLayer.EFContext
         {
             if (AppSetting.EfConnect())
             {
-                services.AddTransient<IRepository<Employee>, EfEmployeeRepository>();
-                services.AddTransient<IRepository<Project>, EfProjectRepository>();
-                services.AddTransient<ITaskRepository<Task>, EfTaskRepository>();
+                services.AddTransient<IRepository<Employee>, EmployeeEfRepository>();
+                services.AddTransient<IRepository<Project>, ProjectEFRepository>();
+                services.AddTransient<ITaskRepository<Task>, TaskEfRepository>();
                 services.AddTransient<TrainingTaskContext>();
             }
             else

@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 namespace BLayer.DTO
 {
     public class EmployeeDTO
@@ -8,5 +10,6 @@ namespace BLayer.DTO
         public string Name { get; set; }
         public string SecondName { get; set; }
         public string Position { get; set; }
+        public ICollection<EmployeeTasksDTO> EmployeeTasks { get; set; }
     }
 }

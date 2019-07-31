@@ -27,6 +27,7 @@ namespace TrainingTask
             services.AddServiceRepository();
             services.AddService();
             services.AddMapperModule();
+            services.AddEntityMapperModule();
             services.Configure<CookiePolicyOptions>(options =>
             {
                 options.CheckConsentNeeded = context => true;

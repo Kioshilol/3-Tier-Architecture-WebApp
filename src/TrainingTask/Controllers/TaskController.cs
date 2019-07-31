@@ -5,7 +5,6 @@ using BLayer.Interfaces;
 using Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using TrainingTask.Mapper;
 using TrainingTask.Models;
 using TrainingTask.ViewModels;
 
@@ -152,15 +151,6 @@ namespace TrainingTask.Controllers
         [HttpPost]
         public IActionResult Create(TaskViewModel task, int[] selectedEmployee)
         {
-            var employeeDTO = _employeeService.GetAll();
-            var employeeViewModel = new List<EmployeeViewModel>();
-
-            foreach (var employee in employeeDTO)
-            {
-                var employeeViewM = _employeeMapper.Map(employee);
-                employeeViewModel.Add(employeeViewM);
-            }
-
             if (ModelState.IsValid)
             {
                 var taskDTO = _taskMapper.Map(task);
@@ -171,7 +161,6 @@ namespace TrainingTask.Controllers
 
             else
             {
-                ViewBag.employee = employeeViewModel;
                 return View(task);
             }
         }
@@ -179,6 +168,17 @@ namespace TrainingTask.Controllers
         {
             if (id != null)
             {
+                var employeeDTO = _employeeService.GetAll();
+                var employeeViewModel = new List<EmployeeViewModel>();
+
+                foreach (var employee in employeeDTO)
+                {
+                    var employeeViewM = _employeeMapper.Map(employee);
+                    employeeViewModel.Add(employeeViewM);
+                }
+
+                ViewBag.Employee = employeeViewModel;
+
                 var projectsDTO = _projectService.GetAll();
                 var projectsViewModel = new List<ProjectViewModel>();
 

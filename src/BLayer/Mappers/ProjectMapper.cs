@@ -1,9 +1,9 @@
 ﻿using BLayer.DTO;
-using BLayer.Mapper;
+using BLayer.Mappers;
 using Core.Interfaces;
 using DLayer.Entities;
 
-namespace BLayer.Mapping
+namespace BLayer.Mappers
 {
     public class ProjectMapper : IMapper<Project, ProjectDTO>
     {
