@@ -6,7 +6,7 @@
 }
 <h2>@ViewData["Title"]</h2>
 
-<form asp-action="Details"  asp-controller="Employee" asp-route-id="@Model.Id">
+<form asp-action="Details" asp-controller="Employee" asp-route-id="@Model.Id">
     <table class="table table-striped">
         <tr>
             <td>Id</td>
@@ -14,6 +14,7 @@
             <td>Surname</td>
             <td>SecondName</td>
             <td>Position</td>
+            <td>Avatar</td>
         </tr>
         <tr>
             <td>@Model.Id</td>
@@ -21,6 +22,7 @@
             <td>@Model.Surname</td>
             <td>@Model.SecondName</td>
             <td>@Model.Position</td>
+            <td><img src="@Model.FilePath" width="100" height="100" /></td>
         </tr>
     </table>
 </form>

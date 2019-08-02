@@ -31,7 +31,8 @@ namespace DLayer.EFContext.EfRepositories
 
         public IEnumerable<Employee> GetAll()
         {
-            return _dbContext.Employee;
+            var employees = _dbContext.Employee.Include(t => t.EmployeeTasks).ThenInclude(e => e.Task).ToList();
+            return employees;
         }
 
         public IEnumerable<Employee> GetAllWithPaging(int pageNumber)

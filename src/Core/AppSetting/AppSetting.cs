@@ -7,13 +7,13 @@ namespace Core
     {
         public static string GetConnectionString()
         {
-            var _connectionString = AddJsonFile().GetSection("ConnectionStrings").GetSection("DefaultConnection").Value;
-            return _connectionString;
+            var connectionString = AddJsonFile().GetSection("ConnectionStrings").GetSection("DefaultConnection").Value;
+            return connectionString;
         }
         public static int GetPageSize()
         {
-            var _size = AddJsonFile().GetSection("PageSize").GetSection("RowsPerPage").Value;
-            return int.Parse(_size);
+            var size = AddJsonFile().GetSection("PageSize").GetSection("RowsPerPage").Value;
+            return int.Parse(size);
         }
 
         private static IConfigurationRoot AddJsonFile()
@@ -35,6 +35,18 @@ namespace Core
         {
             var isMapperEnable = AddJsonFile().GetSection("Mapper").GetSection("AutoMapperEnable").Value;
             return bool.Parse(isMapperEnable);
+        }
+
+        public static string GetPicturesFilePath()
+        {
+            var filePath = AddJsonFile().GetSection("Files").GetSection("Pictures").Value;
+            return filePath;
+        }
+        
+        public static string GetFullPathToPictures()
+        {
+            var filePath = AddJsonFile().GetSection("Files").GetSection("FullPathToPictures").Value;
+            return filePath;
         }
     }
 }

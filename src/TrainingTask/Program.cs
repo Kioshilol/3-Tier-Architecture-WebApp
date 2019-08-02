@@ -8,11 +8,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using DLayer;
+using TrainingTask.Models;
 
 namespace TrainingTask
 {
     public class Program
     {
+        
         public static void Main(string[] args)
         {
             CreateWebHostBuilder(args).Build().Run();

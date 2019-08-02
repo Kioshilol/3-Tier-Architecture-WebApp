@@ -1,4 +1,15 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
+﻿(function () {
+    ('#Submit').on('click', function (evt) {
+        evt.preventDefault();
+        $.ajax({
+            url: '',
+            data: new FormData(document.forms[0]),
+            contentType: false,
+            processData: false,
+            type: 'post',
+            success: function () {
+                alert('Successfully uploaded');
+            }
+        });
+    });
+});

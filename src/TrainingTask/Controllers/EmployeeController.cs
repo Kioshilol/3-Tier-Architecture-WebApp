@@ -2,8 +2,10 @@
 using BLayer.Interfaces;
 using BLayer.Services;
 using Core.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.IO;
 using TrainingTask.Mapper;
 using TrainingTask.Models;
 using TrainingTask.ViewModels;
@@ -132,6 +134,7 @@ namespace TrainingTask.Controllers
                 var employeeDTO = _employeeService.GetById(id.Value);
                 if (employeeDTO != null)
                 {
+
                     var employeeViewModel = _employeeMapper.Map(employeeDTO);
                     return View(employeeViewModel);
                 }

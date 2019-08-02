@@ -19,10 +19,5 @@ namespace DLayer.Entities
         [NotMapped]
         public ICollection<EmployeeTasks> EmployeeTasks { get; set; }
         public int? ProjectId { get; set; }
-
-        public Task()
-        {
-            EmployeeTasks = new List<EmployeeTasks>();
-        }
     }
 }

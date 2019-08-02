@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 
 namespace DLayer.Entities
 {
@@ -9,6 +10,7 @@ namespace DLayer.Entities
         public string Name { get; set; }
         public string SecondName { get; set; }
         public string Position { get; set; }
+        public string FilePath { get; set; }
         public ICollection<EmployeeTasks> EmployeeTasks { get; set; }
     }
 }

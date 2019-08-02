@@ -34,13 +34,13 @@
             <div class="form-group">
                 @if (Model.EmployeeTasks.Count != 0)
                 {
-                        List<EmployeeViewModel> employees = new List<EmployeeViewModel>();
-                        foreach (var task in Model.EmployeeTasks)
-                        {
-                            employees.Add(task.Employee);
-                        }
-
-                        @foreach (var employee in ViewBag.Employee)
+                    List<EmployeeViewModel> employeeFromVB = ViewBag.Employee;
+                    List<EmployeeViewModel> employees = new List<EmployeeViewModel>();
+                    foreach (var task in Model.EmployeeTasks)
+                    {
+                        employees.Add(task.Employee);
+                    }
+                        @foreach (var employee in employeeFromVB)
                         {
                             <input type="checkbox" name="selectedEmployee" value="@employee.Id" 
                                    @(employees.Contains(employee) ? "checked=\"checked\"" : "") />@employee.Name <br />

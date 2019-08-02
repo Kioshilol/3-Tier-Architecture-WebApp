@@ -26,7 +26,15 @@ namespace DLayer.EFContext.EfRepositories
 
         public void Edit(Task entity)
         {
-            UpdateObject(_dbContext, entity);
+            foreach(var item in entity.EmployeeTasks)
+            {
+                var ee = _dbContext.EmployeeTasks.FirstOrDefault(e => e.TaskId == item.TaskId);
+                _dbContext.EmployeeTasks.Remove(ee);
+                _dbContext.EmployeeTasks.Add(new EmployeeTasks { EmployeeId = item.EmployeeId, TaskId =entity.Id });
+            }
+
+            _dbContext.Entry(entity).State = EntityState.Modified;
+            _dbContext.SaveChanges();
         }
 
         public IEnumerable<Task> GetAll()
@@ -66,19 +74,6 @@ namespace DLayer.EFContext.EfRepositories
 
         public int Insert(Task entity)
         {
-            var employee = _dbContext.Employee;
-
-            foreach(var item in employee)
-            {
-                foreach (var id in entity.EmployeeId)
-                {
-                    if(item.Id == id)
-                    {
-                        entity.EmployeeTasks.Add(new EmployeeTasks { Employee = item, Task = entity });
-                    }
-                }
-            }
-
             _dbContext.Task.Add(entity);
             _dbContext.SaveChanges();
             _dbContext.Entry(entity).GetDatabaseValues();

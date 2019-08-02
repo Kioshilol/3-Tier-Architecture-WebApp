@@ -67,6 +67,7 @@ namespace DLayer.Repositories
                 employee.Surname = sqlDataReader["Surname"].ToString();
                 employee.SecondName = sqlDataReader["SecondName"].ToString();
                 employee.Position = sqlDataReader["Position"].ToString();
+                employee.FilePath = sqlDataReader["FilePath"].ToString();
                 employeeList.Add(employee);
             }
 
@@ -80,7 +81,8 @@ namespace DLayer.Repositories
                 new SqlParameter("@Name", entity.Name),
                 new SqlParameter("@Surname", entity.Surname),
                 new SqlParameter("@SecondName", entity.SecondName),
-                new SqlParameter("@Position", entity.Position)
+                new SqlParameter("@Position", entity.Position),
+                new SqlParameter("@FilePath", entity.FilePath)
             };
 
             if (entity.Id == null)

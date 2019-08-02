@@ -5,71 +5,70 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-    <h2>Edit Employee</h2>
+<h2>Edit Employee</h2>
 
 <div class="row">
     <div class="col-md-4">
         <form action="~/Employee/Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Surname" class="control-label"></label>
+                <input asp-for="Surname" class="form-control" />
+                <span asp-validation-for="Surname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SecondName" class="control-label"></label>
+                <input asp-for="SecondName" class="form-control" />
+                <span asp-validation-for="SecondName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Position" class="control-label"></label>
+                <input asp-for="Position" class="form-control" />
+                <span asp-validation-for="Position" class="text-danger"></span>
+            </div>
             @if (Model.Id.HasValue)
             {
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group">
-                    <label asp-for="Surname" class="control-label"></label>
-                    <input asp-for="Surname" class="form-control" />
-                    <span asp-validation-for="Surname" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Name" class="control-label"></label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="SecondName" class="control-label"></label>
-                    <input asp-for="SecondName" class="form-control" />
-                    <span asp-validation-for="SecondName" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Position" class="control-label"></label>
-                    <input asp-for="Position" class="form-control" />
-                    <span asp-validation-for="Position" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <input type="submit" value="Save" asp-route="@Model.Id" class="btn btn-default" />
-                </div>
+                <img src="@Model.FilePath" width="100" height="100" />
             }
-            else
-            {
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group">
-                    <label asp-for="Surname" class="control-label"></label>
-                    <input asp-for="Surname" class="form-control" />
-                    <span asp-validation-for="Surname" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Name" class="control-label"></label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="SecondName" class="control-label"></label>
-                    <input asp-for="SecondName" class="form-control" />
-                    <span asp-validation-for="SecondName" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Position" class="control-label"></label>
-                    <input asp-for="Position" class="form-control" />
-                    <span asp-validation-for="Position" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <input type="submit" value="Create" class="btn btn-default" />
-                </div>
-            }
+            <div class="form-group">
+                <input asp-for="UploadedFile">
+            </div>
+            <div class="form-group">
+                <input id="submit" type="submit" value="Save" asp-route="@Model.Id" class="btn btn-default" />
+            </div>
+
         </form>
-        </>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index"  asp-controller="Employee" >Back to List</a>
+    <a asp-action="Index" asp-controller="Employee">Back to List</a>
 </div>
+
+@section scripts{
+    <script>
+        $(function () {
+            $('#submit').on('click', function (evt) {
+                evt.preventDefault();
+                $.ajax({
+                    url: '',
+                    data: new FormData(document.forms[0]),
+                    contentType: false,
+                    processData: false, 
+                    type: 'post'
+                }).done(function() {
+                 location.href = '/Employee'
+                }).fail(function() {
+                alert( "error" );
+                })
+            });
+        });
+    </script>
+}
+
 

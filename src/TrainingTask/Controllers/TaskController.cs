@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BLayer.DTO;
 using BLayer.Interfaces;
 using Core.Interfaces;
@@ -153,8 +154,12 @@ namespace TrainingTask.Controllers
         {
             if (ModelState.IsValid)
             {
+                foreach(var id in selectedEmployee)
+                {
+                    task.EmployeeTasks.Add(new EmployeeTasksViewModel { EmployeeId = id });
+                }
+
                 var taskDTO = _taskMapper.Map(task);
-                taskDTO.EmployeeId = selectedEmployee;
                 _taskService.Add(taskDTO);
                 return RedirectToAction("Index");
             }
@@ -199,10 +204,15 @@ namespace TrainingTask.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(TaskViewModel task)
+        public IActionResult Edit(TaskViewModel task, int[] selectedEmployee)
         {
             if (ModelState.IsValid)
             {
+                foreach (var id in selectedEmployee)
+                {
+                    task.EmployeeTasks.Add(new EmployeeTasksViewModel { EmployeeId = id });
+                }
+
                 var taskDTO = _taskMapper.Map(task);
                 _taskService.Edit(taskDTO);
                 return RedirectToAction("Index");
