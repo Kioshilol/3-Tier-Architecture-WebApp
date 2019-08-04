@@ -20,7 +20,8 @@ namespace TrainingTask.Controllers
         private IMapper<ProjectDTO, ProjectViewModel> _projectMapper;
         private IMapper<EmployeeDTO, EmployeeViewModel> _employeeMapper;
         public TaskController(ITaskService<TaskDTO> taskService, IService<ProjectDTO> projectService,
-            IService<EmployeeDTO> employeeService, IMapper<ProjectDTO, ProjectViewModel> projectMapper, IMapper<EmployeeDTO, EmployeeViewModel> employeeMapper,
+            IService<EmployeeDTO> employeeService, IMapper<ProjectDTO, ProjectViewModel> projectMapper,
+            IMapper<EmployeeDTO, EmployeeViewModel> employeeMapper,
             IMapper<TaskDTO, TaskViewModel> taskMapper)
         {
             _projectService = projectService;
@@ -35,8 +36,6 @@ namespace TrainingTask.Controllers
         {
             var tasksViewModelPaging = new List<TaskViewModel>();
             var taskListPaging = _taskService.GetAllWithPaging(page);
-            var employees = _employeeService.GetAll();
-
 
             foreach (var task in taskListPaging)
             {
@@ -44,7 +43,6 @@ namespace TrainingTask.Controllers
                 taskViewModel.Project = new ProjectViewModel();
                 tasksViewModelPaging.Add(taskViewModel);
             }
-
 
             var tasksViewModel = new List<TaskViewModel>();
             var taskList = _taskService.GetAll();
@@ -71,7 +69,6 @@ namespace TrainingTask.Controllers
                     }
                 }
             }
-
 
             var pageViewModel = new PageViewModel
             {

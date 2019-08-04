@@ -30,51 +30,30 @@ namespace DLayer.Repositories
             string sp = "spUpdateTask";
             var parametersList = AddParameters(entity);
             ExecuteNonQuery(sp, parametersList);
+            AddEmployeeTasks(entity);
         }
 
         public IEnumerable<Task> GetAllWithPaging(int pageNumber)
         {
             string sp = "spGetAllTasksPaging";
-            string storedProcedure = "spGetAllEmployeeTasks";
             var parametersList = GetParameters(pageNumber);
-            var employeeTasks = ExecuteReader<IList<EmployeeTasks>>(storedProcedure, null, _connection, EmployeeTaskslistMapper);
-            var tasks = ExecuteReader<IList<Task>>(sp, parametersList, _connection, listsMapper);
-            
-            foreach(var task in tasks)
-            {
-                foreach(var item in employeeTasks)
-                {
-                    if (item.TaskId == task.Id)
-                        task.EmployeeTasks.Add(new EmployeeTasks { EmployeeId = item.EmployeeId, TaskId = item.TaskId });
-                }
-            }
-
-            return tasks;
+            return GetEmployees(ExecuteReader<IList<Task>>(sp, parametersList, _connection, listsMapper)); ;
         }
 
         public Task GetById(int id)
         {
             string sp = "spGetTaskById";
             string dbId = "@TaskId";
-            return ExecuteReader<IList<Task>>(sp, GetId(dbId,id), _connection, listsMapper).First();
+            return GetEmployees(ExecuteReader<IList<Task>>(sp, GetId(dbId,id), _connection, listsMapper)).First();
         }
 
         public int Insert(Task entity)
         {
             string sp = "spAddTask";
             var parametersList = AddParameters(entity);
-
-            string storedProcedure = "spAddTasksStaff";
             int taskId = ExecuteReader<int>(sp, parametersList, _connection, idMapper);
-
-            foreach(var item in entity.EmployeeTasks)
-            {
-                List<SqlParameter> parameters = new List<SqlParameter>();
-                parameters.Add(new SqlParameter("@StaffId", item.EmployeeId));
-                parameters.Add(new SqlParameter("@TaskId", taskId));
-                ExecuteNonQuery(storedProcedure, parameters);
-            }
-
+            entity.Id = taskId;
+            AddEmployeeTasks(entity);
             return taskId;
         }
 
@@ -130,20 +109,58 @@ namespace DLayer.Repositories
             return parametersList;
         }
 
-        private Func<SqlDataReader, IList<EmployeeTasks>> EmployeeTaskslistMapper = (sqlDataReader) =>
+        private Func<SqlDataReader, IList<Employee>> EmployeeMapper = (sqlDataReader) =>
         {
-            List<EmployeeTasks> employeeTasksList = new List<EmployeeTasks>();
+            List<Employee> employees = new List<Employee>();
 
             while (sqlDataReader.Read())
             {
-                EmployeeTasks employeeTasks = new EmployeeTasks();
-                employeeTasks.Id = Convert.ToInt32(sqlDataReader["Id"]);
-                employeeTasks.TaskId = Convert.ToInt32(sqlDataReader["TaskId"]);
-                employeeTasks.EmployeeId = Convert.ToInt32(sqlDataReader["EmployeeId"]);
-                employeeTasksList.Add(employeeTasks);
+                Employee employee = new Employee();
+                employee.Name = sqlDataReader["Name"].ToString();
+                employee.Surname = sqlDataReader["Surname"].ToString();
+                employee.SecondName = sqlDataReader["SecondName"].ToString();
+                employee.Id = Convert.ToInt32(sqlDataReader["Id"]);
+                employee.Position = sqlDataReader["Position"].ToString();
+                employee.FilePath = sqlDataReader["FilePath"].ToString();
+                employees.Add(employee);
             }
 
-            return employeeTasksList;
+            return employees;
         };
+
+        private IEnumerable<Task> GetEmployees(IList<Task> tasks)
+        {
+            foreach (var task in tasks)
+            {
+                List<SqlParameter> parameters = new List<SqlParameter>
+                {
+                    new SqlParameter("@TaskId", task.Id)
+                };
+
+                string storedProcedure = "spGetAllEmployeesByTaskId";
+                var employees = ExecuteReader<IList<Employee>>(storedProcedure, parameters, _connection, EmployeeMapper);
+
+                foreach (var employee in employees)
+                {
+                    task.EmployeeTasks.Add(new EmployeeTasks { Employee = employee });
+                }
+            }
+
+            return tasks;
+        }
+
+        private void AddEmployeeTasks(Task entity)
+        {
+            string storedProcedure = "spAddTasksStaff";
+
+            foreach (var item in entity.EmployeeTasks)
+            {
+                List<SqlParameter> parameters = new List<SqlParameter>();
+                parameters.Add(new SqlParameter("@StaffId", item.EmployeeId));
+                parameters.Add(new SqlParameter("@TaskId", entity.Id));
+                ExecuteNonQuery(storedProcedure, parameters);
+            }
+
+        }
     }
 }
