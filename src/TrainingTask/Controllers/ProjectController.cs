@@ -124,8 +124,7 @@ namespace TrainingTask.Controllers
             _projectService.Delete(id);
             return RedirectToAction("Index");
         }
-
-        [Route("projects/{id}")]
+        
         public IActionResult Details(int? id)
         {
             if(id != null)
@@ -145,6 +144,18 @@ namespace TrainingTask.Controllers
                 return View(projectModelView);
             }
             return NotFound();
+        }
+
+        public IActionResult UploadToXML()
+        {
+            _projectService.UploadToXML();
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult UploadToExcel()
+        {
+            _projectService.UploadToExcel();
+            return RedirectToAction("Index");
         }
 
         public IActionResult Privacy()

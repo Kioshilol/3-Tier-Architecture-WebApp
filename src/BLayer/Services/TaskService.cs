@@ -8,6 +8,8 @@ using DLayer.Entities;
 using DLayer.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Xml;
 
 namespace BLayer.Services
 {
@@ -47,7 +49,7 @@ namespace BLayer.Services
 
         public IEnumerable<TaskDTO> GetAllWithPaging(int pageNumber)
         {
-            return GetPaging(_taskMapper, _DataBase.Task.GetAllWithPaging(pageNumber));
+            return GetAll(_taskMapper, _DataBase.Task.GetAllWithPaging(pageNumber));
         }
 
         public TaskDTO GetById(int id)
@@ -58,13 +60,31 @@ namespace BLayer.Services
 
         public IEnumerable<TaskDTO> GetAllTasksByProjectId(int id)
         {
-            return GetPaging(_taskMapper, _DataBase.Task.GetAllTasksByProjectId(id));
+            return GetAll(_taskMapper, _DataBase.Task.GetAllTasksByProjectId(id));
         }
 
         public IEnumerable<TaskDTO> GetAll()
         {
-            var list = GetPaging(_taskMapper, _DataBase.Task.GetAll());
-            return GetPaging(_taskMapper, _DataBase.Task.GetAll());
+            return GetAll(_taskMapper, _DataBase.Task.GetAll());
+        }
+
+        public void UploadToXML()
+        {
+            var tasksDTO = GetAll(_taskMapper, _DataBase.Task.GetAll());
+
+            foreach (var item in tasksDTO)
+            {
+                item.EmployeeTasks = null;
+            }
+
+            var tasksDataTable = ConvertToDataTable(tasksDTO);
+            WriteAndSaveXMLFile(tasksDataTable);
+        }
+
+        public void UploadToExcel()
+        {
+            var tasksDTO = GetAll(_taskMapper, _DataBase.Task.GetAll());
+            ExportToExcel(tasksDTO);
         }
     }
 }

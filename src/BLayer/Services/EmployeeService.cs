@@ -1,16 +1,11 @@
 ﻿using BLayer.DTO;
 using BLayer.Interfaces;
-using BLayer.Mappers;
 using Core;
 using Core.Interfaces;
-using DLayer;
-using DLayer.EFContext.EfEntities;
 using DLayer.Entities;
 using DLayer.Interfaces;
-using Microsoft.AspNetCore.Hosting;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace BLayer.Services
 {
@@ -18,35 +13,32 @@ namespace BLayer.Services
     {
         private IUnitOfWork _DataBase { get; set; }
         private IMapper<Employee,EmployeeDTO> _employeeMapper;
-        private IHostingEnvironment _hostingEnvironment;
-        public EmployeeService(IUnitOfWork dataBase, IMapper<Employee, EmployeeDTO> employeeMapper, IHostingEnvironment environment)
+        public EmployeeService(IUnitOfWork dataBase, IMapper<Employee, EmployeeDTO> employeeMapper)
         {
             _DataBase = dataBase;
             _employeeMapper = employeeMapper;
-            _hostingEnvironment = environment;
         }
 
         public int Add(EmployeeDTO entity)
         {
-            var employee = AddFileSavingAsync(entity);
+            var employee = AddFileSaving(entity);
             return _DataBase.Employee.Insert(employee);
         }
 
         public void Edit(EmployeeDTO entity)
         {
-            var employee = AddFileSavingAsync(entity);
+            var employee = AddFileSaving(entity);
             _DataBase.Employee.Edit(employee);
         }
 
         public IEnumerable<EmployeeDTO> GetAllWithPaging(int pageNumber)
         {
-            return GetPaging(_employeeMapper, _DataBase.Employee.GetAllWithPaging(pageNumber));
+            return GetAll(_employeeMapper, _DataBase.Employee.GetAllWithPaging(pageNumber));
         }
 
         public EmployeeDTO GetById(int id)
         {
             var employee = _DataBase.Employee.GetById(id);
-            employee.FilePath = AppSetting.GetPicturesFilePath() + employee.FilePath;
             return _employeeMapper.Map(employee);
         }
 
@@ -57,21 +49,49 @@ namespace BLayer.Services
 
         public IEnumerable<EmployeeDTO> GetAll()
         {
-            return GetPaging(_employeeMapper, _DataBase.Employee.GetAll());
+            return GetAll(_employeeMapper, _DataBase.Employee.GetAll());
         }
 
-        private Employee AddFileSavingAsync(EmployeeDTO entity)
+        private Employee AddFileSaving(EmployeeDTO employeeDTO)
         {
-            string filePath = AppSetting.GetFullPathToPictures() + entity.UploadedFile.FileName;
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            if(employeeDTO.UploadedFile != null)
             {
-                entity.UploadedFile.CopyTo(stream);
+                string filePath = AppSetting.GetFullPathToPictures() + employeeDTO.UploadedFile.FileName;
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    employeeDTO.UploadedFile.CopyTo(stream);
+                }
+
+                employeeDTO.FilePath = AppSetting.GetPicturesFilePath() + employeeDTO.UploadedFile.FileName;
+            }
+            else
+            {
+                if (employeeDTO.FilePath == null)
+                    employeeDTO.FilePath = AppSetting.SetDefaultAvatar();
             }
 
-            var employee = _employeeMapper.Map(entity);
-            employee.FilePath = entity.UploadedFile.FileName;
+            var employee = _employeeMapper.Map(employeeDTO);
             return employee;
+        }
+
+        public void UploadToXML()
+        {
+            var employeesDTO = GetAll(_employeeMapper, _DataBase.Employee.GetAll());
+
+            foreach (var item in employeesDTO)
+            {
+                item.EmployeeTasks = null;
+            }
+
+            var employeesDataTable = ConvertToDataTable(employeesDTO);
+            WriteAndSaveXMLFile(employeesDataTable);
+        }
+
+        public void UploadToExcel()
+        {
+            var employeesDTO = GetAll(_employeeMapper, _DataBase.Employee.GetAll());
+            ExportToExcel(employeesDTO);
         }
     }
 }

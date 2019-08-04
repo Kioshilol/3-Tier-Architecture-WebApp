@@ -12,6 +12,5 @@ namespace DLayer.Entities
         public string ShortName { get; set; }
         public string Description { get; set; }
         public ICollection<Task> Task { get; set; }
-
     }
 }

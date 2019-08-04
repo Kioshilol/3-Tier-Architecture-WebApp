@@ -22,7 +22,7 @@ namespace BLayer.Mappers
         {
             return new EmployeeDTO()
             {
-                Id = item.Id,
+                Id = item.Id.Value,
                 Name = item.Name,
                 Surname = item.Surname,
                 SecondName = item.SecondName,

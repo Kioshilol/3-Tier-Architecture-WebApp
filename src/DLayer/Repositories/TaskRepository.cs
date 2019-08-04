@@ -35,8 +35,21 @@ namespace DLayer.Repositories
         public IEnumerable<Task> GetAllWithPaging(int pageNumber)
         {
             string sp = "spGetAllTasksPaging";
+            string storedProcedure = "spGetAllEmployeeTasks";
             var parametersList = GetParameters(pageNumber);
-            return ExecuteReader<IList<Task>>(sp, parametersList, _connection, listsMapper);
+            var employeeTasks = ExecuteReader<IList<EmployeeTasks>>(storedProcedure, null, _connection, EmployeeTaskslistMapper);
+            var tasks = ExecuteReader<IList<Task>>(sp, parametersList, _connection, listsMapper);
+            
+            foreach(var task in tasks)
+            {
+                foreach(var item in employeeTasks)
+                {
+                    if (item.TaskId == task.Id)
+                        task.EmployeeTasks.Add(new EmployeeTasks { EmployeeId = item.EmployeeId, TaskId = item.TaskId });
+                }
+            }
+
+            return tasks;
         }
 
         public Task GetById(int id)
@@ -54,10 +67,10 @@ namespace DLayer.Repositories
             string storedProcedure = "spAddTasksStaff";
             int taskId = ExecuteReader<int>(sp, parametersList, _connection, idMapper);
 
-            foreach(var item in entity.EmployeeId)
+            foreach(var item in entity.EmployeeTasks)
             {
                 List<SqlParameter> parameters = new List<SqlParameter>();
-                parameters.Add(new SqlParameter("@StaffId", item));
+                parameters.Add(new SqlParameter("@StaffId", item.EmployeeId));
                 parameters.Add(new SqlParameter("@TaskId", taskId));
                 ExecuteNonQuery(storedProcedure, parameters);
             }
@@ -116,5 +129,21 @@ namespace DLayer.Repositories
                 parametersList.Add(new SqlParameter("@TaskId", entity.Id));
             return parametersList;
         }
+
+        private Func<SqlDataReader, IList<EmployeeTasks>> EmployeeTaskslistMapper = (sqlDataReader) =>
+        {
+            List<EmployeeTasks> employeeTasksList = new List<EmployeeTasks>();
+
+            while (sqlDataReader.Read())
+            {
+                EmployeeTasks employeeTasks = new EmployeeTasks();
+                employeeTasks.Id = Convert.ToInt32(sqlDataReader["Id"]);
+                employeeTasks.TaskId = Convert.ToInt32(sqlDataReader["TaskId"]);
+                employeeTasks.EmployeeId = Convert.ToInt32(sqlDataReader["EmployeeId"]);
+                employeeTasksList.Add(employeeTasks);
+            }
+
+            return employeeTasksList;
+        };
     }
 }

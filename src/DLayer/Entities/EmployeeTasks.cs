@@ -11,6 +11,5 @@ namespace DLayer.Entities
         public int Id { get; set; }
         public Employee Employee { get; set; }
         public Task Task { get; set; }
-
     }
 }

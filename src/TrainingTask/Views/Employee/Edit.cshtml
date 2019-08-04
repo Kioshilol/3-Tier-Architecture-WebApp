@@ -11,6 +11,7 @@
     <div class="col-md-4">
         <form action="~/Employee/Edit" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.HiddenFor(m => m.FilePath);
             <div class="form-group">
                 <label asp-for="Surname" class="control-label"></label>
                 <input asp-for="Surname" class="form-control" />
@@ -39,7 +40,7 @@
                 <input asp-for="UploadedFile">
             </div>
             <div class="form-group">
-                <input id="submit" type="submit" value="Save" asp-route="@Model.Id" class="btn btn-default" />
+                <input id="submit" type="submit" value="Save" class="btn btn-default" />
             </div>
 
         </form>

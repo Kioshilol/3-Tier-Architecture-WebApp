@@ -23,7 +23,7 @@ namespace TrainingTask.Mapper
         {
             return new EmployeeViewModel()
             {
-                Id = item.Id.Value,
+                Id = item.Id,
                 Name = item.Name,
                 Surname = item.Surname,
                 SecondName = item.SecondName,

@@ -26,11 +26,11 @@ namespace DLayer.EFContext.EfRepositories
 
         public void Edit(Task entity)
         {
+            var list = _dbContext.EmployeeTasks.Where(e => e.TaskId == entity.Id);
+            _dbContext.EmployeeTasks.RemoveRange(list);
             foreach(var item in entity.EmployeeTasks)
             {
-                var ee = _dbContext.EmployeeTasks.FirstOrDefault(e => e.TaskId == item.TaskId);
-                _dbContext.EmployeeTasks.Remove(ee);
-                _dbContext.EmployeeTasks.Add(new EmployeeTasks { EmployeeId = item.EmployeeId, TaskId =entity.Id });
+                _dbContext.EmployeeTasks.Add(new EmployeeTasks { EmployeeId = item.EmployeeId, TaskId = entity.Id });
             }
 
             _dbContext.Entry(entity).State = EntityState.Modified;

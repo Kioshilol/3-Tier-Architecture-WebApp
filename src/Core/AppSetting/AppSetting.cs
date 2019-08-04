@@ -48,5 +48,24 @@ namespace Core
             var filePath = AddJsonFile().GetSection("Files").GetSection("FullPathToPictures").Value;
             return filePath;
         }
+
+        public static string SetDefaultAvatar()
+        {
+            var filePath = AddJsonFile().GetSection("Files").GetSection("DefaultAvatar").Value;
+            return filePath;
+        }
+
+        public static string SetExcelFilesPath()
+        {
+            var filePath = AddJsonFile().GetSection("Files").GetSection("FilePathForExcel").Value;
+            return filePath;
+        }
+
+        public static string SetXMLFilesPath()
+        {
+            var filePath = AddJsonFile().GetSection("Files").GetSection("FilePathForXML").Value;
+            return filePath;
+        }
+
     }
 }

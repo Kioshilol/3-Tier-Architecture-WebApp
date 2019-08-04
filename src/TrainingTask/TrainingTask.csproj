@@ -9,6 +9,7 @@
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.9" />
+    <PackageReference Include="NLog" Version="4.6.6" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,6 +21,11 @@
     <Reference Include="System.Data.Linq">
       <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\v3.5\System.Data.Linq.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\files\ExcelFiles\" />
+    <Folder Include="wwwroot\files\XMLFiles\" />
   </ItemGroup>
 
 </Project>

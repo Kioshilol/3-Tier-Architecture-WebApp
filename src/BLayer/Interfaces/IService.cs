@@ -13,5 +13,7 @@ namespace BLayer.Interfaces
         int Add(T entity);
         void Edit(T entity);
         void Delete(int id);
+        void UploadToXML();
+        void UploadToExcel();
     }
 }

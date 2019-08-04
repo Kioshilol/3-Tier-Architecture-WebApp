@@ -4,6 +4,9 @@ using Core.Interfaces;
 using DLayer.Entities;
 using DLayer.Interfaces;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Xml;
 
 namespace BLayer.Services
 {
@@ -27,8 +30,7 @@ namespace BLayer.Services
 
         public IEnumerable<ProjectDTO> GetAll()
         {
-
-            return GetPaging(_projectMapper, _DataBase.Projects.GetAll()); ;
+            return GetAll(_projectMapper, _DataBase.Projects.GetAll());
         }
 
         public int Add(ProjectDTO entity)
@@ -50,7 +52,20 @@ namespace BLayer.Services
 
         public IEnumerable<ProjectDTO> GetAllWithPaging(int pageNumber)
         {
-            return GetPaging(_projectMapper, _DataBase.Projects.GetAllWithPaging(pageNumber));
+            return GetAll(_projectMapper, _DataBase.Projects.GetAllWithPaging(pageNumber));
+        }
+
+        public void UploadToXML()
+        {
+            var projectsDTO = GetAll(_projectMapper, _DataBase.Projects.GetAll());
+            var projectsDataTable = ConvertToDataTable(projectsDTO);
+            WriteAndSaveXMLFile(projectsDataTable);
+        }
+
+        public void UploadToExcel()
+        {
+            var projectsDTO = GetAll(_projectMapper, _DataBase.Projects.GetAll());
+            ExportToExcel(projectsDTO);
         }
     }
 }

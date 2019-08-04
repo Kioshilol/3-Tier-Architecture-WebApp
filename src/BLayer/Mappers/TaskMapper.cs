@@ -18,8 +18,7 @@ namespace BLayer.Mappers
                 DateOfStart = taskDTO.DateOfStart,
                 DateOfEnd = taskDTO.DateOfEnd,
                 TypeStatus = taskDTO.TypeStatus,
-                ProjectId = taskDTO.ProjectId.Value,
-                EmployeeId = taskDTO.EmployeeId,
+                ProjectId = taskDTO.ProjectId,
             };
         }
 
@@ -33,8 +32,7 @@ namespace BLayer.Mappers
                 DateOfStart = task.DateOfStart,
                 DateOfEnd = task.DateOfEnd,
                 TypeStatus = task.TypeStatus,
-                ProjectId = task.ProjectId,
-                EmployeeId = task.EmployeeId,
+                ProjectId = task.ProjectId.Value,
             };
         }
     }

@@ -35,6 +35,8 @@ namespace TrainingTask.Controllers
         {
             var tasksViewModelPaging = new List<TaskViewModel>();
             var taskListPaging = _taskService.GetAllWithPaging(page);
+            var employees = _employeeService.GetAll();
+
 
             foreach (var task in taskListPaging)
             {
@@ -42,6 +44,7 @@ namespace TrainingTask.Controllers
                 taskViewModel.Project = new ProjectViewModel();
                 tasksViewModelPaging.Add(taskViewModel);
             }
+
 
             var tasksViewModel = new List<TaskViewModel>();
             var taskList = _taskService.GetAll();
@@ -68,6 +71,7 @@ namespace TrainingTask.Controllers
                     }
                 }
             }
+
 
             var pageViewModel = new PageViewModel
             {
@@ -255,6 +259,18 @@ namespace TrainingTask.Controllers
             }
 
             return NotFound();
+        }
+
+        public IActionResult UploadToXML()
+        {
+            _taskService.UploadToXML();
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult UploadToExcel()
+        {
+            _taskService.UploadToExcel();
+            return RedirectToAction("Index");
         }
     }
 }

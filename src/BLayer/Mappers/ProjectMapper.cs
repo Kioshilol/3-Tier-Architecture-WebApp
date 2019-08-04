@@ -11,7 +11,7 @@ namespace BLayer.Mappers
         {
             return new ProjectDTO()
             {
-                Id = item.Id,
+                Id = item.Id.Value,
                 Name = item.Name,
                 ShortName = item.ShortName,
                 Description = item.Description
