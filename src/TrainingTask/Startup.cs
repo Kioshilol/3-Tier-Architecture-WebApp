@@ -39,13 +39,14 @@ namespace TrainingTask
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            //env.EnvironmentName = EnvironmentName.Production;
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
             app.UseHttpsRedirection();

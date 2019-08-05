@@ -6,6 +6,7 @@ using BLayer.Interfaces;
 using Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
 using TrainingTask.Models;
 using TrainingTask.ViewModels;
 
@@ -19,10 +20,12 @@ namespace TrainingTask.Controllers
         private IMapper<TaskDTO, TaskViewModel> _taskMapper;
         private IMapper<ProjectDTO, ProjectViewModel> _projectMapper;
         private IMapper<EmployeeDTO, EmployeeViewModel> _employeeMapper;
+        private ILogger<TaskController> _logger;
         public TaskController(ITaskService<TaskDTO> taskService, IService<ProjectDTO> projectService,
             IService<EmployeeDTO> employeeService, IMapper<ProjectDTO, ProjectViewModel> projectMapper,
             IMapper<EmployeeDTO, EmployeeViewModel> employeeMapper,
-            IMapper<TaskDTO, TaskViewModel> taskMapper)
+            IMapper<TaskDTO, TaskViewModel> taskMapper,
+            ILogger<TaskController> logger)
         {
             _projectService = projectService;
             _employeeService = employeeService;
@@ -30,10 +33,12 @@ namespace TrainingTask.Controllers
             _taskMapper = taskMapper;
             _projectMapper = projectMapper;
             _employeeMapper = employeeMapper;
+            _logger = logger;
         }
 
         public IActionResult Index(int page = 1)
         {
+            _logger.LogInformation($"{page}");
             var tasksViewModelPaging = new List<TaskViewModel>();
             var taskListPaging = _taskService.GetAllWithPaging(page);
 
@@ -90,6 +95,7 @@ namespace TrainingTask.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            _logger.LogInformation($"Create task");
             var employeeDTO = _employeeService.GetAll();
             var employeeViewModel = new List<EmployeeViewModel>();
 
@@ -123,29 +129,33 @@ namespace TrainingTask.Controllers
         [HttpGet("projects/{projectid}/Create")]
         public IActionResult Create(int projectid)
         {
-            var employeeDTO = _employeeService.GetAll();
-            var employeeViewModel = new List<EmployeeViewModel>();
-
-            foreach (var employee in employeeDTO)
+            _logger.LogInformation($"{projectid}");
+            if (projectid > 0)
             {
-                var employeeViewM = _employeeMapper.Map(employee);
-                employeeViewModel.Add(employeeViewM);
-            }
+                var employeeDTO = _employeeService.GetAll();
+                var employeeViewModel = new List<EmployeeViewModel>();
 
-            ViewBag.Employee = employeeViewModel;
+                foreach (var employee in employeeDTO)
+                {
+                    var employeeViewM = _employeeMapper.Map(employee);
+                    employeeViewModel.Add(employeeViewM);
+                }
 
-            var model = new TaskViewModel()
-            {
-                DateOfEnd = DateTime.UtcNow
-            };
+                ViewBag.Employee = employeeViewModel;
 
-            var projectDto = _projectService.GetById(projectid);
-            if (projectDto != null)
-            {
-                model.ProjectId = projectid;
-                model.Project = _projectMapper.Map(projectDto);
+                var model = new TaskViewModel()
+                {
+                    DateOfEnd = DateTime.UtcNow
+                };
 
-                return View(model);
+                var projectDto = _projectService.GetById(projectid);
+                if (projectDto != null)
+                {
+                    model.ProjectId = projectid;
+                    model.Project = _projectMapper.Map(projectDto);
+
+                    return View(model);
+                }
             }
             return new BadRequestResult();
         }
@@ -153,6 +163,8 @@ namespace TrainingTask.Controllers
         [HttpPost]
         public IActionResult Create(TaskViewModel task, int[] selectedEmployee)
         {
+            _logger.LogInformation($"{task}; ids of selected employees: {selectedEmployee}");
+
             if (ModelState.IsValid)
             {
                 foreach(var id in selectedEmployee)
@@ -164,7 +176,6 @@ namespace TrainingTask.Controllers
                 _taskService.Add(taskDTO);
                 return RedirectToAction("Index");
             }
-
             else
             {
                 return View(task);
@@ -172,6 +183,8 @@ namespace TrainingTask.Controllers
         }
         public IActionResult Edit(int? id)
         {
+            _logger.LogInformation($"{id}");
+
             if (id != null)
             {
                 var employeeDTO = _employeeService.GetAll();
@@ -207,6 +220,8 @@ namespace TrainingTask.Controllers
         [HttpPost]
         public IActionResult Edit(TaskViewModel task, int[] selectedEmployee)
         {
+            _logger.LogInformation($"{task}; ids of selected employees: {selectedEmployee}");
+
             if (ModelState.IsValid)
             {
                 foreach (var id in selectedEmployee)
@@ -224,7 +239,9 @@ namespace TrainingTask.Controllers
 
         public IActionResult Delete(int? id)
         {
-            if(id != null)
+            _logger.LogInformation($"{id}");
+
+            if (id != null)
             {
                 var taskDTO = _taskService.GetById(id.Value);
                 if(taskDTO != null)
@@ -239,13 +256,23 @@ namespace TrainingTask.Controllers
         [HttpPost, ActionName("Delete")]
         public IActionResult DeleteConfirmed(int id)
         {
-            _taskService.Delete(id);
+            _logger.LogInformation($"{id}");
+            try
+            {
+                _taskService.Delete(id);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogInformation(ex.Message, "Stopped program because of exception ");
+            }
             return RedirectToAction("Index");
         }
 
         public IActionResult Details(int? id)
         {
-            if(id != null)
+            _logger.LogInformation($"{id}");
+
+            if (id != null)
             {
                 var taskDTO = _taskService.GetById(id.Value);
                 if(taskDTO != null)
@@ -260,13 +287,28 @@ namespace TrainingTask.Controllers
 
         public IActionResult UploadToXML()
         {
-            _taskService.UploadToXML();
+            try
+            {
+                _taskService.ExportToXML();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message, "Stopped program because of exception ");
+            }
             return RedirectToAction("Index");
         }
 
         public IActionResult UploadToExcel()
         {
-            _taskService.UploadToExcel();
+            try
+            {
+                _taskService.ExportToExcel();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message, "Stopped program because of exception ");
+            }
+
             return RedirectToAction("Index");
         }
     }

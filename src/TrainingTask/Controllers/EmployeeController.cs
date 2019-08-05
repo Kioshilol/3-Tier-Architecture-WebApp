@@ -2,6 +2,8 @@
 using BLayer.Interfaces;
 using Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using TrainingTask.Models;
 using TrainingTask.ViewModels;
@@ -12,14 +14,17 @@ namespace TrainingTask.Controllers
     {
         private IService<EmployeeDTO> _employeeService;
         private IMapper<EmployeeDTO,EmployeeViewModel> _employeeMapper;
-        public EmployeeController(IService<EmployeeDTO> employeeService, IMapper<EmployeeDTO, EmployeeViewModel> employeeMapper)
+        private ILogger<EmployeeController> _logger;
+        public EmployeeController(IService<EmployeeDTO> employeeService, IMapper<EmployeeDTO, EmployeeViewModel> employeeMapper, ILogger<EmployeeController> logger)
         {
             _employeeService = employeeService;
             _employeeMapper = employeeMapper;
+            _logger = logger;
         }
         [HttpGet()]
         public IActionResult Index(int page = 1)
         {
+            _logger.LogInformation($"{page}");
             var employeeViewModelListPaging = new List<EmployeeViewModel>();
             var employeeListPaging = _employeeService.GetAllWithPaging(page);
             var employeeViewModelList = new List<EmployeeViewModel>();
@@ -56,6 +61,7 @@ namespace TrainingTask.Controllers
 
         public IActionResult Edit(int? id)
         {
+            _logger.LogInformation($"{id}");
             if (id.HasValue)
             {
                 var employeeDTO = _employeeService.GetById(id.Value);
@@ -75,6 +81,7 @@ namespace TrainingTask.Controllers
         [HttpPost]
         public IActionResult Edit(EmployeeViewModel employee)
         {
+            _logger.LogInformation($"{employee}");
             if (employee.Id.HasValue)
             {
                 if (ModelState.IsValid)
@@ -100,7 +107,8 @@ namespace TrainingTask.Controllers
 
         public IActionResult Delete(int? id)
         {
-            if(id != null) 
+            _logger.LogInformation($"{id}");
+            if (id != null) 
             {
                 var employeeDTO = _employeeService.GetById(id.Value);
                 if (employeeDTO != null)
@@ -115,6 +123,7 @@ namespace TrainingTask.Controllers
         [HttpPost, ActionName("Delete")]
         public IActionResult DeleteConfirmed(int? id)
         {
+            _logger.LogInformation($"{id}");
             if (id != null)
             {
                 _employeeService.Delete(id.Value);
@@ -125,6 +134,7 @@ namespace TrainingTask.Controllers
 
         public IActionResult Details(int? id)
         {
+            _logger.LogInformation($"{id}");
             if (id != null)
             {
                 var employeeDTO = _employeeService.GetById(id.Value);
@@ -140,13 +150,29 @@ namespace TrainingTask.Controllers
 
         public IActionResult UploadToXML()
         {
-            _employeeService.UploadToXML();
+            try
+            {
+                _employeeService.ExportToXML();
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message, "Stopped program because of exception");
+                throw;
+            }
             return RedirectToAction("Index");
         }
 
         public IActionResult UploadToExcel()
         {
-            _employeeService.UploadToExcel();
+            try
+            {
+                _employeeService.ExportToExcel();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, "Stopped program because of exception");
+                throw;
+            }
             return RedirectToAction("Index");
         }
     }
