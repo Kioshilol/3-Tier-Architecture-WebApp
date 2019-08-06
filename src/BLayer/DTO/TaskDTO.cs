@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Xml.Serialization;
 
 namespace BLayer.DTO
 {
@@ -17,6 +18,11 @@ namespace BLayer.DTO
         public ProjectDTO Project { get; set; }
         public int ProjectId { get; set; }
         [NotMapped]
-        public ICollection<EmployeeTasksDTO> EmployeeTasks { get; set; }
+        public List<EmployeeTasksDTO> EmployeeTasks { get; set; }
+
+        public TaskDTO()
+        {
+            EmployeeTasks = new List<EmployeeTasksDTO>();
+        }
     }
 }

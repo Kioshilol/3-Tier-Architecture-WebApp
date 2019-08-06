@@ -21,8 +21,8 @@ namespace DLayer.Repositories
         public void Delete(int id)
         {
             string sp = "spDeleteTask";
-            string dbId = "@TaskId";
-            ExecuteNonQuery(sp, GetId(dbId,id));
+            string taskId = "@TaskId";
+            ExecuteNonQuery(sp, GetId(taskId,id));
         }
 
         public void Edit(Task entity)
@@ -30,21 +30,20 @@ namespace DLayer.Repositories
             string sp = "spUpdateTask";
             var parametersList = AddParameters(entity);
             ExecuteNonQuery(sp, parametersList);
-            AddEmployeeTasks(entity);
         }
 
         public IEnumerable<Task> GetAllWithPaging(int pageNumber)
         {
             string sp = "spGetAllTasksPaging";
             var parametersList = GetParameters(pageNumber);
-            return GetEmployees(ExecuteReader<IList<Task>>(sp, parametersList, _connection, listsMapper)); ;
+            return ExecuteReader<IList<Task>>(sp, parametersList, _connection, listsMapper);
         }
 
         public Task GetById(int id)
         {
             string sp = "spGetTaskById";
-            string dbId = "@TaskId";
-            return GetEmployees(ExecuteReader<IList<Task>>(sp, GetId(dbId,id), _connection, listsMapper)).First();
+            string taskId = "@TaskId";
+            return ExecuteReader<IList<Task>>(sp, GetId(taskId, id), _connection, listsMapper).First();
         }
 
         public int Insert(Task entity)
@@ -55,13 +54,6 @@ namespace DLayer.Repositories
             entity.Id = taskId;
             AddEmployeeTasks(entity);
             return taskId;
-        }
-
-        public IEnumerable<Task> GetAllTasksByProjectId(int id)
-        {
-            string sp = "spGetTasksByProjectId";
-            string dbId = "@ProjectId";
-            return ExecuteReader<IList<Task>>(sp, GetId(dbId,id), _connection, listsMapper);
         }
 
         private Func<SqlDataReader, IList<Task>> listsMapper = (sqlDataReader) =>
@@ -109,44 +101,11 @@ namespace DLayer.Repositories
             return parametersList;
         }
 
-        private Func<SqlDataReader, IList<Employee>> EmployeeMapper = (sqlDataReader) =>
+        public IEnumerable<Task> GetTasksByProjectId(int id)
         {
-            List<Employee> employees = new List<Employee>();
-
-            while (sqlDataReader.Read())
-            {
-                Employee employee = new Employee();
-                employee.Name = sqlDataReader["Name"].ToString();
-                employee.Surname = sqlDataReader["Surname"].ToString();
-                employee.SecondName = sqlDataReader["SecondName"].ToString();
-                employee.Id = Convert.ToInt32(sqlDataReader["Id"]);
-                employee.Position = sqlDataReader["Position"].ToString();
-                employee.FilePath = sqlDataReader["FilePath"].ToString();
-                employees.Add(employee);
-            }
-
-            return employees;
-        };
-
-        private IEnumerable<Task> GetEmployees(IList<Task> tasks)
-        {
-            foreach (var task in tasks)
-            {
-                List<SqlParameter> parameters = new List<SqlParameter>
-                {
-                    new SqlParameter("@TaskId", task.Id)
-                };
-
-                string storedProcedure = "spGetAllEmployeesByTaskId";
-                var employees = ExecuteReader<IList<Employee>>(storedProcedure, parameters, _connection, EmployeeMapper);
-
-                foreach (var employee in employees)
-                {
-                    task.EmployeeTasks.Add(new EmployeeTasks { Employee = employee });
-                }
-            }
-
-            return tasks;
+            string sp = "spGetTasksByProjectId";
+            string projectId = "@ProjectId";
+            return ExecuteReader<IList<Task>>(sp, GetId(projectId, id), _connection, listsMapper);
         }
 
         private void AddEmployeeTasks(Task entity)
@@ -161,6 +120,13 @@ namespace DLayer.Repositories
                 ExecuteNonQuery(storedProcedure, parameters);
             }
 
+        }
+
+        public IEnumerable<Task> GetTasksByEmployeeId(int id)
+        {
+            string sp = "spGetTasksByEmployeeId";
+            string projectId = "@EmployeeId";
+            return ExecuteReader<IList<Task>>(sp, GetId(projectId, id), _connection, listsMapper);
         }
     }
 }

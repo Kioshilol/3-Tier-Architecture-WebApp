@@ -25,7 +25,7 @@ namespace TrainingTask.Models
         [Required]
         public Status TypeStatus { get; set; }
         public int[] EmployeeId { get; set; }
-        public ICollection<EmployeeTasksViewModel> EmployeeTasks { get; set; }
+        public List<EmployeeTasksViewModel> EmployeeTasks { get; set; }
 
         public TaskViewModel()
         {

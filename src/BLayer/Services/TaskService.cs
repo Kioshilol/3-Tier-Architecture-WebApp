@@ -1,7 +1,6 @@
 ﻿using BLayer.DTO;
 using BLayer.Interfaces;
 using BLayer.Mappers;
-using BLayer.Mappers;
 using BLayer.Mappers.AutoMappers;
 using Core.Interfaces;
 using DLayer.Entities;
@@ -14,24 +13,31 @@ using System.Xml;
 
 namespace BLayer.Services
 {
-    public class TaskService :BaseService<Task,TaskDTO>, ITaskService<TaskDTO>
+    public class TaskService :BaseService, IService<TaskDTO>
     {
-        private IUnitOfWork _DataBase { get; set; }
+        private IUnitOfWork _dataBase { get; set; }
         private IMapper<Task, TaskDTO> _taskMapper;
+        private IMapper<Employee, EmployeeDTO> _employeeMapper;
+        private IMapper<Project, ProjectDTO> _projectMapper;
         private ILogger<TaskService> _logger;
-        public TaskService(IUnitOfWork dataBase, IMapper<Task, TaskDTO> taskMapper, ILogger<TaskService> logger)
+        public TaskService(IUnitOfWork dataBase, IMapper<Task, TaskDTO> taskMapper,
+            ILogger<TaskService> logger, IMapper<Employee, EmployeeDTO> employeeMapper,
+            IMapper<Project, ProjectDTO> projectMapper)
         {
-            _DataBase = dataBase;
+            _dataBase = dataBase;
             _taskMapper = taskMapper;
+            _employeeMapper = employeeMapper;
             _logger = logger;
+            _projectMapper = projectMapper;
         }
         public int Add(TaskDTO entity)
         {
             _logger.LogInformation($"{entity}");
-            entity.DateOfStart = DateTime.UtcNow;
+            int id;
 
             try
             {
+                entity.DateOfStart = DateTime.UtcNow;
                 TimeSpan timeOfTask = entity.DateOfEnd - entity.DateOfStart;
                 long timeOfTaskDays = timeOfTask.Days;
 
@@ -40,16 +46,18 @@ namespace BLayer.Services
                     _logger.LogError($"{timeOfTaskDays} less than 1");
                     throw new Exception("Wrong Number(less than 1)");
                 }
+
                 entity.TaskTime = timeOfTaskDays;
+                var task = _taskMapper.Map(entity);
+                id = _dataBase.Tasks.Insert(task);
             }
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message, "Stopped program because of exception");
                 throw;
             }
-            
-            var task = _taskMapper.Map(entity);
-            return _DataBase.Task.Insert(task);
+
+            return id;
         }
 
         public void Delete(int id)
@@ -57,7 +65,7 @@ namespace BLayer.Services
             _logger.LogInformation($"Delete task by id: {id}");
             try
             {
-                _DataBase.Task.Delete(id);
+                _dataBase.Tasks.Delete(id);
             }
             catch(Exception ex)
             {
@@ -69,72 +77,100 @@ namespace BLayer.Services
         public void Edit(TaskDTO entity)
         {
             _logger.LogInformation($"Editing of task. Id:{entity.Id}");
-            var task = _taskMapper.Map(entity);
-            _DataBase.Task.Edit(task);
+
+            try
+            {
+                var task = _taskMapper.Map(entity);
+                _dataBase.Tasks.Edit(task);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, "Stopped program because of exception");
+                throw;
+            }
         }
 
         public IEnumerable<TaskDTO> GetAllWithPaging(int pageNumber)
         {
             _logger.LogInformation($"Get all tasks by page number: {pageNumber}");
-            return GetAll(_taskMapper, _DataBase.Task.GetAllWithPaging(pageNumber));
+            IEnumerable<TaskDTO> tasksDTO;
+
+            try
+            {
+                tasksDTO = BaseMapper(_taskMapper, _dataBase.Tasks.GetAllWithPaging(pageNumber));
+                TaskInitialization(tasksDTO);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, "Stopped program because of exception");
+                throw;
+            }
+
+            return tasksDTO;
         }
 
         public TaskDTO GetById(int id)
         {
             _logger.LogInformation($"Get task by id:{id}");
-            var task = _DataBase.Task.GetById(id);
-            return _taskMapper.Map(task);
-        }
+            TaskDTO taskDTO;
+            try
+            {
+                var task = _dataBase.Tasks.GetById(id);
+                taskDTO = _taskMapper.Map(task);
+                var tasksDTO = new List<TaskDTO>();
+                tasksDTO.Add(taskDTO);
+                TaskInitialization(tasksDTO);
 
-        public IEnumerable<TaskDTO> GetAllTasksByProjectId(int id)
-        {
-            _logger.LogInformation($"Get all tasks by project id: {id}");
-            return GetAll(_taskMapper, _DataBase.Task.GetAllTasksByProjectId(id));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, "Stopped program because of exception");
+                throw;
+            }
+
+            return taskDTO;
         }
 
         public IEnumerable<TaskDTO> GetAll()
         {
             _logger.LogInformation($"Get all tasks");
-            return GetAll(_taskMapper, _DataBase.Task.GetAll());
-        }
-
-        public void ExportToXML()
-        {
-            var tasksDTO = GetAll(_taskMapper, _DataBase.Task.GetAll());
-            _logger.LogInformation($"Export {tasksDTO} to XML");
-
-            foreach (var item in tasksDTO)
-            {
-                item.EmployeeTasks = null;
-            }
-
-            var tasksDataTable = ConvertToDataTable(tasksDTO);
+            IEnumerable<TaskDTO> tasksDTO;
 
             try
             {
-                WriteAndSaveXMLFile(tasksDataTable);
+                tasksDTO = BaseMapper(_taskMapper, _dataBase.Tasks.GetAll());
+                TaskInitialization(tasksDTO);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message, "Stopped program because of exception");
                 throw;
             }
+
+            return tasksDTO;
         }
 
-        public void ExportToExcel()
+        private IEnumerable<TaskDTO> TaskInitialization(IEnumerable<TaskDTO> tasksDTO)
         {
-            var tasksDTO = GetAll(_taskMapper, _DataBase.Task.GetAll());
-            _logger.LogInformation($"Export {tasksDTO} to excel");
+            foreach (var taskDTO in tasksDTO)
+            {
+                var employeesDTO = BaseMapper(_employeeMapper, _dataBase.Employees.GetEmployeesByTaskId(taskDTO.Id));
+                foreach (var employee in employeesDTO)
+                {
+                    taskDTO.EmployeeTasks.Add(new EmployeeTasksDTO { Employee = employee });
+                }
+            }
 
-            try
+            foreach(var taskDTO in tasksDTO)
             {
-                ExportToExcel(tasksDTO);
+                var projectsDTO = BaseMapper(_projectMapper, _dataBase.Projects.GetAll());
+                foreach(var projectDTO in projectsDTO)
+                {
+                    if(taskDTO.ProjectId == projectDTO.Id)
+                        taskDTO.Project = projectDTO;
+                }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message, "Stopped program because of exception");
-                throw;
-            }
+            return tasksDTO;
         }
     }
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ProjectViewModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Id>100</Id>
+  <Name>qweqe</Name>
+  <ShortName>qweqw</ShortName>
+  <Description>qweqwe</Description>
+  <Tasks>
+    <TaskViewModel>
+      <Id>247</Id>
+      <Name>12313</Name>
+      <ProjectId>100</ProjectId>
+      <TaskTime>3</TaskTime>
+      <DateOfStart>2019-08-06T00:00:00</DateOfStart>
+      <DateOfEnd>2019-08-10T00:00:00</DateOfEnd>
+      <TypeStatus>NotStarted</TypeStatus>
+      <EmployeeTasks />
+    </TaskViewModel>
+  </Tasks>
+</ProjectViewModel>

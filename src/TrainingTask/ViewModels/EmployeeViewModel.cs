@@ -1,9 +1,8 @@
-﻿using DLayer.Entities;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Xml.Serialization;
 using TrainingTask.ViewModels;
 
 namespace TrainingTask.Models
@@ -18,7 +17,8 @@ namespace TrainingTask.Models
         public string SecondName { get; set; }
         [Required]
         public string Position { get; set; }
-        public IEnumerable<EmployeeTasksViewModel> EmployeeTasks { get; set; }
+        public List<EmployeeTasksViewModel> EmployeeTasks { get; set; }
+        [XmlIgnore]
         public IFormFile UploadedFile { get; set; }
         public string FilePath { get; set; }
 

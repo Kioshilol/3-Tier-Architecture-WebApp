@@ -9,36 +9,52 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Xml.Serialization;
 
 namespace BLayer.Services
 {
-    public class EmployeeService :BaseService<Employee,EmployeeDTO>, IService<EmployeeDTO>
+    public class EmployeeService :BaseService, IService<EmployeeDTO>
     {
-        private IUnitOfWork _DataBase { get; set; }
+        private IUnitOfWork _dataBase { get; set; }
         private IMapper<Employee,EmployeeDTO> _employeeMapper;
+        private IMapper<Task, TaskDTO> _taskMapper;
         private ILogger<EmployeeService> _logger;
-        public EmployeeService(IUnitOfWork dataBase, IMapper<Employee, EmployeeDTO> employeeMapper, ILogger<EmployeeService> logger)
+        public EmployeeService(IUnitOfWork dataBase, IMapper<Employee, EmployeeDTO> employeeMapper,
+            ILogger<EmployeeService> logger, IMapper<Task, TaskDTO> taskMapper)
         {
-            _DataBase = dataBase;
+            _dataBase = dataBase;
             _employeeMapper = employeeMapper;
             _logger = logger;
+            _taskMapper = taskMapper;
         }
 
         public int Add(EmployeeDTO entity)
         {
             _logger.LogInformation($" Add entity. Name: {entity.Name}");
-            var employee = SaveImage(entity);
-            return _DataBase.Employee.Insert(employee);
+            int id;
+
+            try
+            {
+                var employee = SaveImage(entity);
+                id = _dataBase.Employees.Insert(employee);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message, "Stopped program because of exception");
+                throw;
+            }
+
+            return id;
         }
 
         public void Edit(EmployeeDTO entity)
         {
             _logger.LogInformation($"Editing of project. Id:{entity.Id}");
-            var employee = SaveImage(entity);
 
             try
             {
-                _DataBase.Employee.Edit(employee);
+                var employee = SaveImage(entity);
+                _dataBase.Employees.Edit(employee);
             }
             catch(Exception ex)
             {
@@ -50,22 +66,47 @@ namespace BLayer.Services
         public IEnumerable<EmployeeDTO> GetAllWithPaging(int pageNumber)
         {
             _logger.LogInformation($"Get employees by page number {pageNumber}");
-            return GetAll(_employeeMapper, _DataBase.Employee.GetAllWithPaging(pageNumber));
+            IEnumerable<EmployeeDTO> employeesDTO;
+
+            try
+            {
+                employeesDTO = BaseMapper(_employeeMapper, _dataBase.Employees.GetAllWithPaging(pageNumber));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message, "Stopped program because of exception");
+                throw;
+            }
+
+            return employeesDTO;
         }
 
         public EmployeeDTO GetById(int id)
         {
             _logger.LogInformation($"Get employee by id {id}");
-            var employee = _DataBase.Employee.GetById(id);
-            return _employeeMapper.Map(employee);
+            EmployeeDTO employeeDTO;
+
+            try
+            {
+                var employee = _dataBase.Employees.GetById(id);
+                employeeDTO = _employeeMapper.Map(employee);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message, "Stopped program because of exception");
+                throw;
+            }
+
+            return employeeDTO;
         }
 
         public void Delete(int id)
         {
             _logger.LogInformation($"Delete employee by id {id}");
+
             try
             {
-                _DataBase.Employee.Delete(id);
+                _dataBase.Employees.Delete(id);
             }
             catch(Exception ex)
             {
@@ -77,7 +118,20 @@ namespace BLayer.Services
         public IEnumerable<EmployeeDTO> GetAll()
         {
             _logger.LogInformation("Get all employees");
-            return GetAll(_employeeMapper, _DataBase.Employee.GetAll());
+            IEnumerable<EmployeeDTO> employeesDTO;
+
+            try
+            {
+                employeesDTO = BaseMapper(_employeeMapper, _dataBase.Employees.GetAll());
+                EmployeeInitialization(employeesDTO);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message, "Stopped program because of exception");
+                throw;
+            }
+
+            return employeesDTO;
         }
 
         private Employee SaveImage(EmployeeDTO employeeDTO)
@@ -113,43 +167,17 @@ namespace BLayer.Services
             return employee;
         }
 
-        public void ExportToXML()
+        private IEnumerable<EmployeeDTO> EmployeeInitialization(IEnumerable<EmployeeDTO> employeesDTO)
         {
-            var employeesDTO = GetAll(_employeeMapper, _DataBase.Employee.GetAll());
-            _logger.LogInformation($"Export {employeesDTO} to XML");
-
-            foreach (var item in employeesDTO)
+            foreach (var employeeDTO in employeesDTO)
             {
-                item.EmployeeTasks = null;
+                var tasksDTO = BaseMapper(_taskMapper, _dataBase.Tasks.GetTasksByEmployeeId(employeeDTO.Id.Value));
+                foreach (var taskDTO in tasksDTO)
+                {
+                    employeeDTO.EmployeeTasks.Add(new EmployeeTasksDTO { Task = taskDTO });
+                }
             }
-
-            var employeesDataTable = ConvertToDataTable(employeesDTO);
-
-            try
-            {
-                WriteAndSaveXMLFile(employeesDataTable);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message, "Stopped program because of exception");
-                throw;
-            }
-        }
-
-        public void ExportToExcel()
-        {
-            var employeesDTO = GetAll(_employeeMapper, _DataBase.Employee.GetAll());
-            _logger.LogInformation($"Export {employeesDTO} to excel");
-
-            try
-            {
-                ExportToExcel(employeesDTO);
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex.Message, "Stopped program because of exception");
-                throw;
-            }
+            return employeesDTO;
         }
     }
 }

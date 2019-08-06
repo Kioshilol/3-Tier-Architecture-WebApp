@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace DLayer.EFContext.EfRepositories
 {
-    public class EmployeeEfRepository :BaseRepository<Employee>, IRepository<Employee>
+    public class EmployeeEfRepository :BaseRepository<Employee>, IEmployeeRepository<Employee>
     {
         private TrainingTaskContext _dbContext;
         public EmployeeEfRepository(TrainingTaskContext dbContext)
@@ -31,7 +31,7 @@ namespace DLayer.EFContext.EfRepositories
 
         public IEnumerable<Employee> GetAll()
         {
-            var employees = _dbContext.Employee.Include(t => t.EmployeeTasks).ThenInclude(e => e.Task).ToList();
+            var employees = _dbContext.Employee;
             return employees;
         }
 
@@ -51,6 +51,11 @@ namespace DLayer.EFContext.EfRepositories
         public Employee GetById(int id)
         {
             return _dbContext.Employee.Find(id);
+        }
+
+        public IEnumerable<Employee> GetEmployeesByTaskId(int id)
+        {
+            return _dbContext.Employee.Where(e => e.EmployeeTasks.Any(et => e.Id == et.EmployeeId && et.TaskId == id)).ToList();
         }
 
         public int Insert(Employee entity)

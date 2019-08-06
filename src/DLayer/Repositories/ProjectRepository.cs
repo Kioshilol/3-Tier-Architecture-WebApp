@@ -1,4 +1,5 @@
-﻿using Core.Interfaces;
+﻿using Core.Enum;
+using Core.Interfaces;
 using DLayer.Entities;
 using System;
 using System.Collections.Generic;
@@ -18,12 +19,12 @@ namespace DLayer.Repositories
         {
             _connection = new SqlConnection();
         }
-        
+
         public void Delete(int id)
         {
             string sp = "spDeleteProject";
-            string dbId = "@ProjectId";
-            ExecuteNonQuery(sp, GetId(dbId,id));
+            string projectId = "@ProjectId";
+            ExecuteNonQuery(sp, GetId(projectId, id));
         }
         public void Edit(Project entity)
         {
@@ -48,15 +49,15 @@ namespace DLayer.Repositories
         public Project GetById(int id)
         {
             string sp = "spGetProjectById";
-            string dbId = "@ProjectId";
-            return ExecuteReader<IList<Project>>(sp, GetId(dbId,id), _connection, listsMapper).First();
+            string projectId = "@ProjectId";
+            return ExecuteReader<IList<Project>>(sp, GetId(projectId, id), _connection, listsMapper).First();
         }
 
         public int Insert(Project entity)
         {
             string sp = "spAddProject";
             var parametersList = AddParameters(entity);
-            return ExecuteReader<int>(sp, parametersList,_connection,idMapper);
+            return ExecuteReader<int>(sp, parametersList, _connection, idMapper);
         }
 
         private Func<SqlDataReader, IList<Project>> listsMapper = (sqlDataReader) =>

@@ -19,9 +19,9 @@ namespace DLayer.EFContext.EfRepositories
         }
         public void Delete(int id)
         {
-            Project project = _dbContext.Project.Include(p => p.Task).FirstOrDefault(p => p.Id == id);
+            Project project = _dbContext.Project.Include(p => p.Tasks).FirstOrDefault(p => p.Id == id);
 
-            foreach (var item in project.Task)
+            foreach (var item in project.Tasks)
             {
                 Task task = _dbContext.Task.Include(t => t.EmployeeTasks).FirstOrDefault(t => t.Id == item.Id);
                 _dbContext.Task.Remove(task);

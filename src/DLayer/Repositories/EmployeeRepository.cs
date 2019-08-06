@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace DLayer.Repositories
 {
-    public class EmployeeRepository :BaseRepository, IRepository<Employee>
+    public class EmployeeRepository :BaseRepository, IEmployeeRepository<Employee>
     {
         private SqlConnection _connection;
         public EmployeeRepository() : base()
@@ -17,8 +17,8 @@ namespace DLayer.Repositories
         public void Delete(int id)
         {
             string sp = "spDeleteStaff";
-            string dbId = "@StaffId";
-            ExecuteNonQuery(sp, GetId(dbId,id));
+            string employeeId = "@StaffId";
+            ExecuteNonQuery(sp, GetId(employeeId,id));
         }
 
         public void Edit(Employee entity)
@@ -38,8 +38,8 @@ namespace DLayer.Repositories
         public Employee GetById(int id)
         {
             string sp = "spGetStaffById";
-            string dbId = "@StaffId";
-            return ExecuteReader<IList<Employee>>(sp, GetId(dbId, id), _connection, listsMapper).First();
+            string employeeId = "@StaffId";
+            return ExecuteReader<IList<Employee>>(sp, GetId(employeeId, id), _connection, listsMapper).First();
         }
 
         public int Insert(Employee entity)
@@ -90,6 +90,13 @@ namespace DLayer.Repositories
             else
                 parametersList.Add(new SqlParameter("@StaffId", entity.Id));
             return parametersList;
+        }
+
+        public IEnumerable<Employee> GetEmployeesByTaskId(int id)
+        {
+            string sp = "spGetAllEmployeesByTaskId";
+            string taskId = "@TaskId";
+            return ExecuteReader<IList<Employee>>(sp, GetId(taskId, id), _connection, listsMapper);
         }
     }
 }

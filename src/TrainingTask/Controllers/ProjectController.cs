@@ -16,50 +16,57 @@ namespace TrainingTask.Controllers
     public class ProjectController : Controller
     {
         private IService<ProjectDTO> _projectService;
-        private ITaskService<TaskDTO> _taskService;
+        private IService<TaskDTO> _taskService;
         private IMapper<ProjectDTO, ProjectViewModel> _projectMapper;
         private IMapper<TaskDTO, TaskViewModel> _taskMapper;
         private ILogger<ProjectController> _logger;
-        public ProjectController(IService<ProjectDTO> projectService, ITaskService<TaskDTO> taskService,
-            IMapper<ProjectDTO, ProjectViewModel> projectMapper, IMapper<TaskDTO, TaskViewModel> taskMapper, ILogger<ProjectController> logger)
+        private IExportToXML<ProjectViewModel> _exportToXML;
+        private IExportToExcel<ProjectDTO> _exportToExcel;
+        public ProjectController(IService<ProjectDTO> projectService, IService<TaskDTO> taskService,
+            IMapper<ProjectDTO, ProjectViewModel> projectMapper, IMapper<TaskDTO, TaskViewModel> taskMapper,
+            ILogger<ProjectController> logger, IExportToXML<ProjectViewModel> exportToXML,
+            IExportToExcel<ProjectDTO> exportToExcel)
         {
             _projectService = projectService;
             _taskService = taskService;
             _projectMapper = projectMapper;
             _taskMapper = taskMapper;
             _logger = logger;
+            _exportToXML = exportToXML;
+            _exportToExcel = exportToExcel;
         }
         public IActionResult Index(int page = 1)
         {
             _logger.LogInformation($"{page}");
-            var projectViewModelList = new List<ProjectViewModel>();
-            IEnumerable<ProjectDTO> projectPagingList = _projectService.GetAllWithPaging(page);
-            var allProjects = new List<ProjectViewModel>();
-            IEnumerable<ProjectDTO> projectList = _projectService.GetAll();
+            var allProjectsVM = new List<ProjectViewModel>();
+            var allProjects = _projectService.GetAll();
 
-            foreach (var project in projectList)
+            foreach (var project in allProjects)
             {
-                var projectViewModel = this._projectMapper.Map(project);
-                allProjects.Add(projectViewModel);
+                var projectViewModel = _projectMapper.Map(project);
+                allProjectsVM.Add(projectViewModel);
             }
 
-            foreach (var project in projectPagingList)
+            var projects = _projectService.GetAllWithPaging(page);
+            var projectsVM = new List<ProjectViewModel>();
+
+            foreach (var project in projects)
             {
-                var projectViewModel = this._projectMapper.Map(project);
-                projectViewModelList.Add(projectViewModel);
+                var projectViewModel = _projectMapper.Map(project);
+                projectsVM.Add(projectViewModel);
             }
 
             var pageViewModel = new PageViewModel
             {
                 PageNumber = page,
                 RowsPerPage = PageSetting.GetRowsPerPage(),
-                TotalRecords = allProjects.Count,
-                TotalPages = allProjects.Count / PageSetting.GetRowsPerPage()
+                TotalRecords = allProjectsVM.Count,
+                TotalPages = PageSetting.GetTotalPages(allProjectsVM)
             };
 
             var indexViewModel = new IndexViewModel<ProjectViewModel>
             {
-                ViewModelList = projectViewModelList,
+                ViewModelList = projectsVM,
                 Page = pageViewModel
             };
 
@@ -160,16 +167,6 @@ namespace TrainingTask.Controllers
             {
                 var projectDTO = _projectService.GetById(id.Value);
                 var projectModelView = _projectMapper.Map(projectDTO);
-                var tasksDTO = _taskService.GetAllTasksByProjectId(id.Value);
-                projectModelView.Tasks = new List<TaskViewModel>();
-
-                foreach (var task in tasksDTO)
-                {
-                    var taskViewModel = _taskMapper.Map(task);
-                    projectModelView.Tasks.Add(taskViewModel);
-                }
-
-                TempData["ProjectId"] = projectModelView.Id;
                 return View(projectModelView);
             }
             return NotFound();
@@ -179,7 +176,18 @@ namespace TrainingTask.Controllers
         {
             try
             {
-                _projectService.ExportToXML();
+                var projectsDTO =  _projectService.GetAll();
+                var projectsVM = new List<ProjectViewModel>();
+
+                foreach(var projectDTO in projectsDTO)
+                {
+                    var projectVM = _projectMapper.Map(projectDTO);
+                    projectsVM.Add(projectVM);
+
+                }
+
+                _exportToXML.ExportToXML(projectsVM);
+                
             }
             catch(Exception ex)
             {
@@ -194,7 +202,8 @@ namespace TrainingTask.Controllers
         {
             try
             {
-                _projectService.ExportToExcel();
+                var projectsDTO = _projectService.GetAll();
+                _exportToExcel.ExportToExcel(projectsDTO);
             }
             catch (Exception ex)
             {

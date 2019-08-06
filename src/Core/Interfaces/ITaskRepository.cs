@@ -6,6 +6,8 @@ namespace Core.Interfaces
 {
     public interface ITaskRepository<Task> : IRepository<Task>
     {
-        IEnumerable<Task> GetAllTasksByProjectId(int id);
+        IEnumerable<Task> GetTasksByProjectId(int id);
+        IEnumerable<Task> GetTasksByEmployeeId(int id);
+
     }
 }

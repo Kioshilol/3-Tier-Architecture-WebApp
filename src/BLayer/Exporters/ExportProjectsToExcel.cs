@@ -1,41 +1,20 @@
-﻿using Core;
-using Core.Interfaces;
+﻿using BLayer.DTO;
+using BLayer.Interfaces;
+using Core;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Reflection;
-using System.Xml;
+using System.Text;
 
-namespace BLayer
+namespace BLayer.Exporters
 {
-    public class BaseService
+    public class ExportProjectsToExcel : IExportToExcel<ProjectDTO>
     {
-        protected IEnumerable<U> BaseMapper<T, U>(IMapper<T, U> mapper, IEnumerable<T> list)
+        public void ExportToExcel(IEnumerable<ProjectDTO> collection)
         {
-            IEnumerable<T> TList = list;
-            var TListDTO = new List<U>();
-
-            foreach (dynamic item in TList)
-            {
-                var itemDTO = mapper.Map(item);
-                TListDTO.Add(itemDTO);
-            }
-
-            return TListDTO;
-        }
-
-        protected void ExportToExcel<T>(IEnumerable<T> collection)
-        {
-            List<T> list = new List<T>();
-
-            foreach(var item in collection)
-            {
-                list.Add(item);
-            }
-
-            Type type = typeof(T);
+            Type type = typeof(ProjectDTO);
             string fileName = $"{type.Name}Details{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
             FileInfo file = new FileInfo(Path.Combine(AppSetting.SetExcelFilesPath(), fileName));
             PropertyInfo[] propertyInfos = type.GetProperties();
@@ -43,21 +22,26 @@ namespace BLayer
             using (ExcelPackage excelPackage = new ExcelPackage(file))
             {
                 ExcelWorksheet excelWorksheet = excelPackage.Workbook.Worksheets.Add($"{type.Name}");
-                int totalRows = list.Count;
                 int column = 1;
-                int row = 2;
+                int row = 1;
                 int count = 1;
 
                 foreach (var property in propertyInfos)
                 {
-                    excelWorksheet.Cells[1, count].Value = property.Name;
+                    excelWorksheet.Cells[row, count].Value = property.Name;
                     count++;
                 }
+                row++;
 
-                foreach (var item in list)
+                foreach (var item in collection)
                 {
-                    foreach(var property in propertyInfos)
+                    var totalTasks = item.Tasks.Count;
+                    foreach (var property in propertyInfos)
                     {
+                        if(totalTasks > 1)
+                        {
+                            excelWorksheet.Cells[row, column, row - 1  + totalTasks, column].Merge = true;
+                        }
                         excelWorksheet.Cells[row, column].Value = property.GetValue(item, null);
                         column++;
                     }
@@ -68,6 +52,5 @@ namespace BLayer
                 excelPackage.Save();
             }
         }
-
     }
 }

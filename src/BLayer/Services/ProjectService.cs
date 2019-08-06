@@ -9,18 +9,19 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Xml;
+using System.Xml.Serialization;
 
 namespace BLayer.Services
 {
-    public class ProjectService : BaseService<Project,ProjectDTO>, IService<ProjectDTO>
+    public class ProjectService : BaseService, IService<ProjectDTO>
     {
-        private IUnitOfWork _DataBase { get; set; }
+        private IUnitOfWork _dataBase { get; set; }
         private IMapper<Project, ProjectDTO> _projectMapper;
         private IMapper<Task, TaskDTO> _taskMapper;
         private ILogger<ProjectService> _logger;
         public ProjectService(IUnitOfWork dataBase, IMapper<Task, TaskDTO> taskMapper, IMapper<Project, ProjectDTO> projectMapper, ILogger<ProjectService> logger)
         {
-            _DataBase = dataBase;
+            _dataBase = dataBase;
             _projectMapper = projectMapper;
             _taskMapper = taskMapper;
             _logger = logger;
@@ -29,28 +30,70 @@ namespace BLayer.Services
         public ProjectDTO GetById(int id)
         {
             _logger.LogInformation($"Get project by id: {id}");
-            var project = _DataBase.Projects.GetById(id);
-            return _projectMapper.Map(project);            
+            ProjectDTO projectdDTO;
+
+            try
+            {
+                var project = _dataBase.Projects.GetById(id);
+                var tasks = BaseMapper(_taskMapper, _dataBase.Tasks.GetTasksByProjectId(id));
+                projectdDTO = _projectMapper.Map(project);
+
+                foreach(var task in tasks)
+                {
+                    projectdDTO.Tasks.Add(task);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, "Stopped program because of exception");
+                throw;
+            }
+
+            return projectdDTO;
         }
 
         public IEnumerable<ProjectDTO> GetAll()
         {
             _logger.LogInformation($"Get all projects");
-            return GetAll(_projectMapper, _DataBase.Projects.GetAll());
+            IEnumerable<ProjectDTO> projectsDTO;
+
+            try
+            {
+                projectsDTO = BaseMapper(_projectMapper, _dataBase.Projects.GetAll());
+                var tasksDTO = BaseMapper(_taskMapper, _dataBase.Tasks.GetAll());
+                ProjectInitialization(tasksDTO, projectsDTO);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message, "Stopped program because of exception");
+                throw;
+            }
+            return projectsDTO;
+
         }
 
         public int Add(ProjectDTO entity)
         {
             _logger.LogInformation($"Add project {entity.Name}");
             var project = _projectMapper.Map(entity);
-            return _DataBase.Projects.Insert(project);
+            return _dataBase.Projects.Insert(project);
         }
 
         public void Edit(ProjectDTO entity)
         {
             _logger.LogInformation($"Editing of project. Id:{entity.Id}");
-            var project = _projectMapper.Map(entity);
-            _DataBase.Projects.Edit(project);
+
+            try
+            {
+                var project = _projectMapper.Map(entity);
+                _dataBase.Projects.Edit(project);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, "Stopped program because of exception");
+                throw;
+            }
         }
 
         public void Delete(int id)
@@ -59,7 +102,7 @@ namespace BLayer.Services
 
             try
             {
-                _DataBase.Projects.Delete(id);
+                _dataBase.Projects.Delete(id);
             }
             catch(Exception ex)
             {
@@ -71,40 +114,32 @@ namespace BLayer.Services
         public IEnumerable<ProjectDTO> GetAllWithPaging(int pageNumber)
         {
             _logger.LogInformation($"Get all projects by page number: {pageNumber}");
-            return GetAll(_projectMapper, _DataBase.Projects.GetAllWithPaging(pageNumber));
-        }
-
-        public void ExportToXML()
-        {
-            var projectsDTO = GetAll(_projectMapper, _DataBase.Projects.GetAll());
-            var projectsDataTable = ConvertToDataTable(projectsDTO);
-            _logger.LogInformation($"Export {projectsDTO} to XML");
+            IEnumerable<ProjectDTO> projectsDTO;
 
             try
             {
-                WriteAndSaveXMLFile(projectsDataTable);
+                projectsDTO = BaseMapper(_projectMapper, _dataBase.Projects.GetAllWithPaging(pageNumber));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message, "Stopped program because of exception");
                 throw;
             }
+
+            return projectsDTO;
         }
 
-        public void ExportToExcel()
+        private IEnumerable<ProjectDTO> ProjectInitialization(IEnumerable<TaskDTO> tasksDTO, IEnumerable<ProjectDTO> projectsDTO)
         {
-            var projectsDTO = GetAll(_projectMapper, _DataBase.Projects.GetAll());
-            _logger.LogInformation($"Export {projectsDTO} to excel");
-
-            try
+            foreach (var projectDTO in projectsDTO)
             {
-                ExportToExcel(projectsDTO);
+                foreach (var taskDTO in tasksDTO)
+                {
+                    if (projectDTO.Id == taskDTO.ProjectId)
+                        projectDTO.Tasks.Add(taskDTO);
+                }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message, "Stopped program because of exception");
-                throw;
-            }
+            return projectsDTO;
         }
     }
 }

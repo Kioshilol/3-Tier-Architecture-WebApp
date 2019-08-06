@@ -42,7 +42,7 @@ namespace DLayer.EFContext.EfRepositories
             return _dbContext.Task;
         }
 
-        public IEnumerable<Task> GetAllTasksByProjectId(int id)
+        public IEnumerable<Task> GetTasksByProjectId(int id)
         {
             return _dbContext.Task.Where(task => task.ProjectId == id);
         }
@@ -55,7 +55,7 @@ namespace DLayer.EFContext.EfRepositories
             }
             else
             {
-                var tasks = _dbContext.Task.Include(t => t.EmployeeTasks).ThenInclude(e => e.Employee).ToList();
+                var tasks = _dbContext.Task;
                 int pageSize = AppSetting.GetPageSize();
                 return tasks.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
             }
@@ -63,7 +63,7 @@ namespace DLayer.EFContext.EfRepositories
 
         public Task GetById(int id)
         {
-            var tasks = _dbContext.Task.Include(t => t.EmployeeTasks).ThenInclude(e => e.Employee).ToList();
+            var tasks = _dbContext.Task;
             foreach (var task in tasks)
             {
                 if (task.Id == id)
@@ -78,6 +78,11 @@ namespace DLayer.EFContext.EfRepositories
             _dbContext.SaveChanges();
             _dbContext.Entry(entity).GetDatabaseValues();
             return entity.Id;
+        }
+
+        public IEnumerable<Task> GetTasksByEmployeeId(int id)
+        {
+            return _dbContext.Task.Where(t => t.EmployeeTasks.Any(et => t.Id == et.TaskId && et.EmployeeId == id)).ToList();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using BLayer.DTO;
 using BLayer.Interfaces;
@@ -14,18 +15,20 @@ namespace TrainingTask.Controllers
 {
     public class TaskController : Controller
     {
-        private ITaskService<TaskDTO> _taskService;
+        private IService<TaskDTO> _taskService;
         private IService<ProjectDTO> _projectService;
         private IService<EmployeeDTO> _employeeService;
         private IMapper<TaskDTO, TaskViewModel> _taskMapper;
         private IMapper<ProjectDTO, ProjectViewModel> _projectMapper;
         private IMapper<EmployeeDTO, EmployeeViewModel> _employeeMapper;
         private ILogger<TaskController> _logger;
-        public TaskController(ITaskService<TaskDTO> taskService, IService<ProjectDTO> projectService,
+        private IExportToXML<TaskViewModel> _exportToXML;
+        public TaskController(IService<TaskDTO> taskService, IService<ProjectDTO> projectService,
             IService<EmployeeDTO> employeeService, IMapper<ProjectDTO, ProjectViewModel> projectMapper,
             IMapper<EmployeeDTO, EmployeeViewModel> employeeMapper,
             IMapper<TaskDTO, TaskViewModel> taskMapper,
-            ILogger<TaskController> logger)
+            ILogger<TaskController> logger,
+            IExportToXML<TaskViewModel> exportToXML)
         {
             _projectService = projectService;
             _employeeService = employeeService;
@@ -34,6 +37,7 @@ namespace TrainingTask.Controllers
             _projectMapper = projectMapper;
             _employeeMapper = employeeMapper;
             _logger = logger;
+            _exportToXML = exportToXML;
         }
 
         public IActionResult Index(int page = 1)
@@ -45,7 +49,6 @@ namespace TrainingTask.Controllers
             foreach (var task in taskListPaging)
             {
                 var taskViewModel = _taskMapper.Map(task);
-                taskViewModel.Project = new ProjectViewModel();
                 tasksViewModelPaging.Add(taskViewModel);
             }
 
@@ -58,29 +61,12 @@ namespace TrainingTask.Controllers
                 tasksViewModel.Add(taskViewModel);
             }
 
-            var projectsDTO = _projectService.GetAll();
-            var projectsViewModel = new List<ProjectViewModel>();
-
-            foreach (var project in projectsDTO)
-            {
-                var projectViewModel = _projectMapper.Map(project);
-                projectsViewModel.Add(projectViewModel);
-
-                foreach (var task in tasksViewModelPaging)
-                {
-                    if(task.ProjectId == projectViewModel.Id)
-                    {
-                        task.Project = projectViewModel;
-                    }
-                }
-            }
-
             var pageViewModel = new PageViewModel
             {
                 PageNumber = page,
                 RowsPerPage = PageSetting.GetRowsPerPage(),
                 TotalRecords = tasksViewModel.Count,
-                TotalPages = tasksViewModel.Count / PageSetting.GetRowsPerPage()
+                TotalPages = PageSetting.GetTotalPages(tasksViewModel)
             };
 
             var indexViewModel = new IndexViewModel<TaskViewModel>
@@ -284,29 +270,26 @@ namespace TrainingTask.Controllers
 
             return NotFound();
         }
-
         public IActionResult UploadToXML()
         {
             try
             {
-                _taskService.ExportToXML();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex.Message, "Stopped program because of exception ");
-            }
-            return RedirectToAction("Index");
-        }
+                var tasksDTO = _taskService.GetAll();
+                var tasksVM = new List<TaskViewModel>();
 
-        public IActionResult UploadToExcel()
-        {
-            try
-            {
-                _taskService.ExportToExcel();
+                foreach (var taskDTO in tasksDTO)
+                {
+                    var taskVM = _taskMapper.Map(taskDTO);
+                    tasksVM.Add(taskVM);
+                }
+
+                _exportToXML.ExportToXML(tasksVM);
+
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex.Message, "Stopped program because of exception ");
+                _logger.LogError(ex.Message, "Stopped program because of exception ");
+                throw;
             }
 
             return RedirectToAction("Index");

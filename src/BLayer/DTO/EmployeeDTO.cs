@@ -13,8 +13,9 @@ namespace BLayer.DTO
         public string Name { get; set; }
         public string SecondName { get; set; }
         public string Position { get; set; }
+        [XmlIgnore]
         public IFormFile UploadedFile { get; set; }
         public string FilePath { get; set; }
-        public ICollection<EmployeeTasksDTO> EmployeeTasks { get; set; }
+        public List<EmployeeTasksDTO> EmployeeTasks { get; set; }
     }
 }

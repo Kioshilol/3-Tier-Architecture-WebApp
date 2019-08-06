@@ -14,7 +14,7 @@ namespace DLayer.EFContext
         {
             if (AppSetting.EfConnect())
             {
-                services.AddTransient<IRepository<Employee>, EmployeeEfRepository>();
+                services.AddTransient<IEmployeeRepository<Employee>, EmployeeEfRepository>();
                 services.AddTransient<IRepository<Project>, ProjectEFRepository>();
                 services.AddTransient<ITaskRepository<Task>, TaskEfRepository>();
                 services.AddTransient<TrainingTaskContext>();
@@ -23,7 +23,7 @@ namespace DLayer.EFContext
             {
                 services.AddTransient<IRepository<Project>, ProjectRepository>();
                 services.AddTransient<ITaskRepository<Task>, TaskRepository>();
-                services.AddTransient<IRepository<Employee>, EmployeeRepository>();
+                services.AddTransient<IEmployeeRepository<Employee>, EmployeeRepository>();
             }
         }
     }

@@ -10,7 +10,7 @@ namespace TrainingTask.Util
         public static void AddService(this IServiceCollection services)
         {
             services.AddTransient<IService<ProjectDTO>, ProjectService>();
-            services.AddTransient<ITaskService<TaskDTO>, TaskService>();
+            services.AddTransient<IService<TaskDTO>, TaskService>();
             services.AddTransient<IService<EmployeeDTO>, EmployeeService>();
         }
     }

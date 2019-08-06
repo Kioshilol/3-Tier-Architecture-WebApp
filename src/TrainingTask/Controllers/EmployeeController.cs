@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using TrainingTask.Models;
 using TrainingTask.ViewModels;
 
@@ -15,44 +16,47 @@ namespace TrainingTask.Controllers
         private IService<EmployeeDTO> _employeeService;
         private IMapper<EmployeeDTO,EmployeeViewModel> _employeeMapper;
         private ILogger<EmployeeController> _logger;
-        public EmployeeController(IService<EmployeeDTO> employeeService, IMapper<EmployeeDTO, EmployeeViewModel> employeeMapper, ILogger<EmployeeController> logger)
+        private IExportToXML<EmployeeViewModel> _exportToXML;
+        public EmployeeController(IService<EmployeeDTO> employeeService, IMapper<EmployeeDTO, EmployeeViewModel> employeeMapper,
+            ILogger<EmployeeController> logger, IExportToXML<EmployeeViewModel> exportToXML)
         {
             _employeeService = employeeService;
             _employeeMapper = employeeMapper;
             _logger = logger;
+            _exportToXML = exportToXML;
         }
         [HttpGet()]
         public IActionResult Index(int page = 1)
         {
             _logger.LogInformation($"{page}");
-            var employeeViewModelListPaging = new List<EmployeeViewModel>();
-            var employeeListPaging = _employeeService.GetAllWithPaging(page);
-            var employeeViewModelList = new List<EmployeeViewModel>();
-            var employeeList = _employeeService.GetAll();
+            var employeesVM = new List<EmployeeViewModel>();
+            var employeesDTO = _employeeService.GetAllWithPaging(page);
+            var allEmployeeVM = new List<EmployeeViewModel>();
+            var allEmployeesDTO = _employeeService.GetAll();
 
-            foreach(var employee in employeeList)
+            foreach(var employeeDTO in allEmployeesDTO)
             {
-                var employeeDTO = _employeeMapper.Map(employee);
-                employeeViewModelList.Add(employeeDTO);
+                var employeeVM = _employeeMapper.Map(employeeDTO);
+                allEmployeeVM.Add(employeeVM);
             }
 
-            foreach (var employee in employeeListPaging)
+            foreach (var employee in employeesDTO)
             {
-                var employeeDTO = _employeeMapper.Map(employee);
-                employeeViewModelListPaging.Add(employeeDTO);
+                var employeeVM = _employeeMapper.Map(employee);
+                employeesVM.Add(employeeVM);
             }
 
             var pageViewModel = new PageViewModel
             {
                 PageNumber = page,
                 RowsPerPage = PageSetting.GetRowsPerPage(),
-                TotalRecords = employeeViewModelList.Count,
-                TotalPages = employeeViewModelList.Count / PageSetting.GetRowsPerPage()
+                TotalRecords = allEmployeeVM.Count,
+                TotalPages = PageSetting.GetTotalPages(allEmployeeVM)
             };
 
             var indexViewModel = new IndexViewModel<EmployeeViewModel>
             {
-                ViewModelList = employeeViewModelListPaging,
+                ViewModelList = employeesVM,
                 Page = pageViewModel
             };
 
@@ -152,7 +156,16 @@ namespace TrainingTask.Controllers
         {
             try
             {
-                _employeeService.ExportToXML();
+                var employeesDTO = _employeeService.GetAll();
+                var eployeesVM = new List<EmployeeViewModel>();
+
+                foreach (var employeeDTO in employeesDTO)
+                {
+                    var employeeVM = _employeeMapper.Map(employeeDTO);
+                    eployeesVM.Add(employeeVM);
+                }
+
+                _exportToXML.ExportToXML(eployeesVM);
             }
             catch(Exception ex)
             {
@@ -166,7 +179,6 @@ namespace TrainingTask.Controllers
         {
             try
             {
-                _employeeService.ExportToExcel();
             }
             catch (Exception ex)
             {

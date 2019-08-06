@@ -6,10 +6,10 @@ namespace DLayer
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private IRepository<Employee> _employee;
+        private IEmployeeRepository<Employee> _employee;
         private ITaskRepository<Task> _task;
         private IRepository<Project> _project;
-        public UnitOfWork(IRepository<Employee> employee, IRepository<Project> project, ITaskRepository<Task> task)
+        public UnitOfWork(IEmployeeRepository<Employee> employee, IRepository<Project> project, ITaskRepository<Task> task)
         {
             _employee = employee;
             _project = project;
@@ -24,7 +24,7 @@ namespace DLayer
             }
         }
 
-        public IRepository<Employee> Employee
+        public IEmployeeRepository<Employee> Employees
         {
             get
             {
@@ -32,7 +32,7 @@ namespace DLayer
             }
         }
 
-        public ITaskRepository<Task> Task
+        public ITaskRepository<Task> Tasks
         {
             get
             {

@@ -78,7 +78,7 @@ namespace DLayer.EFContext.EfEntities
                 entity.Property(e => e.TypeStatus).HasMaxLength(50);
 
                 entity.HasOne(d => d.Project)
-                    .WithMany(p => p.Task)
+                    .WithMany(p => p.Tasks)
                     .HasForeignKey(d => d.ProjectId)
                     .HasConstraintName("FK_Task_Project")
                     .OnDelete(DeleteBehavior.Cascade);
