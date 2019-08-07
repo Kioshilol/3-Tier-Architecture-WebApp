@@ -13,7 +13,7 @@ using System.Xml.Serialization;
 
 namespace BLayer.Services
 {
-    public class ProjectService : BaseService, IService<ProjectDTO>
+    public class ProjectService : BaseMapper, IService<ProjectDTO>
     {
         private IUnitOfWork _dataBase { get; set; }
         private IMapper<Project, ProjectDTO> _projectMapper;
@@ -35,7 +35,7 @@ namespace BLayer.Services
             try
             {
                 var project = _dataBase.Projects.GetById(id);
-                var tasks = BaseMapper(_taskMapper, _dataBase.Tasks.GetTasksByProjectId(id));
+                var tasks = Map(_taskMapper, _dataBase.Tasks.GetTasksByProjectId(id));
                 projectdDTO = _projectMapper.Map(project);
 
                 foreach(var task in tasks)
@@ -60,8 +60,8 @@ namespace BLayer.Services
 
             try
             {
-                projectsDTO = BaseMapper(_projectMapper, _dataBase.Projects.GetAll());
-                var tasksDTO = BaseMapper(_taskMapper, _dataBase.Tasks.GetAll());
+                projectsDTO = Map(_projectMapper, _dataBase.Projects.GetAll());
+                var tasksDTO = Map(_taskMapper, _dataBase.Tasks.GetAll());
                 ProjectInitialization(tasksDTO, projectsDTO);
             }
             catch(Exception ex)
@@ -118,7 +118,7 @@ namespace BLayer.Services
 
             try
             {
-                projectsDTO = BaseMapper(_projectMapper, _dataBase.Projects.GetAllWithPaging(pageNumber));
+                projectsDTO = Map(_projectMapper, _dataBase.Projects.GetAllWithPaging(pageNumber));
             }
             catch (Exception ex)
             {

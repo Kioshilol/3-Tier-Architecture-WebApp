@@ -18,7 +18,7 @@ namespace BLayer.DTO
         public ProjectDTO Project { get; set; }
         public int ProjectId { get; set; }
         [NotMapped]
-        public List<EmployeeTasksDTO> EmployeeTasks { get; set; }
+        public ICollection<EmployeeTasksDTO> EmployeeTasks { get; set; }
 
         public TaskDTO()
         {

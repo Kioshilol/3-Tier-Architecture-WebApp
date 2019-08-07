@@ -10,7 +10,6 @@ namespace TrainingTask.ViewModels
 {
     public class EmployeeTasksViewModel
     {
-        [XmlIgnore]
         public int? EmployeeId { get; set; }
         [XmlIgnore]
         public int? TaskId { get; set; }
@@ -18,20 +17,5 @@ namespace TrainingTask.ViewModels
         public int Id { get; set; }
         public EmployeeViewModel Employee { get; set; }
         public TaskViewModel Task { get; set; }
-
-        //public XmlSchema GetSchema()
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public void ReadXml(XmlReader reader)
-        //{
-            
-        //}
-
-        //public void WriteXml(XmlWriter writer)
-        //{
-        //    throw new NotImplementedException();
-        //}
     }
 }

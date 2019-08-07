@@ -30,6 +30,7 @@ namespace DLayer.Repositories
             string sp = "spUpdateTask";
             var parametersList = AddParameters(entity);
             ExecuteNonQuery(sp, parametersList);
+            AddEmployeeTasks(entity);
         }
 
         public IEnumerable<Task> GetAllWithPaging(int pageNumber)

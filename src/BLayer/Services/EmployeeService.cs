@@ -13,7 +13,7 @@ using System.Xml.Serialization;
 
 namespace BLayer.Services
 {
-    public class EmployeeService :BaseService, IService<EmployeeDTO>
+    public class EmployeeService :BaseMapper, IService<EmployeeDTO>
     {
         private IUnitOfWork _dataBase { get; set; }
         private IMapper<Employee,EmployeeDTO> _employeeMapper;
@@ -70,7 +70,7 @@ namespace BLayer.Services
 
             try
             {
-                employeesDTO = BaseMapper(_employeeMapper, _dataBase.Employees.GetAllWithPaging(pageNumber));
+                employeesDTO = Map(_employeeMapper, _dataBase.Employees.GetAllWithPaging(pageNumber));
             }
             catch (Exception ex)
             {
@@ -122,7 +122,7 @@ namespace BLayer.Services
 
             try
             {
-                employeesDTO = BaseMapper(_employeeMapper, _dataBase.Employees.GetAll());
+                employeesDTO = Map(_employeeMapper, _dataBase.Employees.GetAll());
                 EmployeeInitialization(employeesDTO);
             }
             catch (Exception ex)
@@ -171,9 +171,10 @@ namespace BLayer.Services
         {
             foreach (var employeeDTO in employeesDTO)
             {
-                var tasksDTO = BaseMapper(_taskMapper, _dataBase.Tasks.GetTasksByEmployeeId(employeeDTO.Id.Value));
+                var tasksDTO = Map(_taskMapper, _dataBase.Tasks.GetTasksByEmployeeId(employeeDTO.Id.Value));
                 foreach (var taskDTO in tasksDTO)
                 {
+                    var list = new List<TaskDTO>();
                     employeeDTO.EmployeeTasks.Add(new EmployeeTasksDTO { Task = taskDTO });
                 }
             }

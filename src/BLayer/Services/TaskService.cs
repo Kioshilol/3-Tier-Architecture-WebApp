@@ -13,7 +13,7 @@ using System.Xml;
 
 namespace BLayer.Services
 {
-    public class TaskService :BaseService, IService<TaskDTO>
+    public class TaskService :BaseMapper, IService<TaskDTO>
     {
         private IUnitOfWork _dataBase { get; set; }
         private IMapper<Task, TaskDTO> _taskMapper;
@@ -97,7 +97,7 @@ namespace BLayer.Services
 
             try
             {
-                tasksDTO = BaseMapper(_taskMapper, _dataBase.Tasks.GetAllWithPaging(pageNumber));
+                tasksDTO = Map(_taskMapper, _dataBase.Tasks.GetAllWithPaging(pageNumber));
                 TaskInitialization(tasksDTO);
             }
             catch (Exception ex)
@@ -138,7 +138,7 @@ namespace BLayer.Services
 
             try
             {
-                tasksDTO = BaseMapper(_taskMapper, _dataBase.Tasks.GetAll());
+                tasksDTO = Map(_taskMapper, _dataBase.Tasks.GetAll());
                 TaskInitialization(tasksDTO);
             }
             catch (Exception ex)
@@ -154,7 +154,7 @@ namespace BLayer.Services
         {
             foreach (var taskDTO in tasksDTO)
             {
-                var employeesDTO = BaseMapper(_employeeMapper, _dataBase.Employees.GetEmployeesByTaskId(taskDTO.Id));
+                var employeesDTO = Map(_employeeMapper, _dataBase.Employees.GetEmployeesByTaskId(taskDTO.Id));
                 foreach (var employee in employeesDTO)
                 {
                     taskDTO.EmployeeTasks.Add(new EmployeeTasksDTO { Employee = employee });
@@ -163,7 +163,7 @@ namespace BLayer.Services
 
             foreach(var taskDTO in tasksDTO)
             {
-                var projectsDTO = BaseMapper(_projectMapper, _dataBase.Projects.GetAll());
+                var projectsDTO = Map(_projectMapper, _dataBase.Projects.GetAll());
                 foreach(var projectDTO in projectsDTO)
                 {
                     if(taskDTO.ProjectId == projectDTO.Id)

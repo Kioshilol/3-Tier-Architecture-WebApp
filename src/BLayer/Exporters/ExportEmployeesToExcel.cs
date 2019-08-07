@@ -1,18 +1,17 @@
 ﻿using BLayer.DTO;
 using BLayer.Interfaces;
-using Core;
-using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace BLayer.Exporters
 {
-    public class ExportProjectsToExcel : IExportToExcel<ProjectDTO>
+    public class ExportEmployeesToExcel : IExportToExcel<EmployeeDTO>
     {
-        public MemoryStream Export(IEnumerable<ProjectDTO> collection)
+        public MemoryStream Export(IEnumerable<EmployeeDTO> collection)
         {
             var stream = new MemoryStream();
             Type type = typeof(ProjectDTO);
@@ -33,22 +32,28 @@ namespace BLayer.Exporters
 
             foreach (var item in collection)
             {
-                var totalTasks = item.Tasks.Count;
+                var totalTasks = item.EmployeeTasks.Count;
                 excelWorksheet.Cells[row, column].Value = item.Id;
                 excelWorksheet.Cells[row, column, row + totalTasks - 1, column].Merge = true;
                 column++;
                 excelWorksheet.Cells[row, column].Value = item.Name;
-                excelWorksheet.Cells[row, column, row  + totalTasks - 1, column].Merge = true;
+                excelWorksheet.Cells[row, column, row + totalTasks - 1, column].Merge = true;
                 column++;
-                excelWorksheet.Cells[row, column].Value = item.ShortName;
-                excelWorksheet.Cells[row, column, row  + totalTasks - 1, column].Merge = true;
+                excelWorksheet.Cells[row, column].Value = item.Surname;
+                excelWorksheet.Cells[row, column, row + totalTasks - 1, column].Merge = true;
                 column++;
-                excelWorksheet.Cells[row, column].Value = item.Description;
-                excelWorksheet.Cells[row, column, row  + totalTasks - 1, column].Merge = true;
+                excelWorksheet.Cells[row, column].Value = item.SecondName;
+                excelWorksheet.Cells[row, column, row + totalTasks - 1, column].Merge = true;
                 column++;
-                foreach (var task in item.Tasks)
+                excelWorksheet.Cells[row, column].Value = item.Position;
+                excelWorksheet.Cells[row, column, row + totalTasks - 1, column].Merge = true;
+                column++;
+                excelWorksheet.Cells[row, column].Value = item.FilePath;
+                excelWorksheet.Cells[row, column, row + totalTasks - 1, column].Merge = true;
+                column++;
+                foreach (var employeeTasks in item.EmployeeTasks)
                 {
-                    excelWorksheet.Cells[row, column].Value = task.Name;
+                    excelWorksheet.Cells[row, column].Value = employeeTasks.Task.Name;
                     row++;
                 }
                 column = 1;

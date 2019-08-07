@@ -11,6 +11,6 @@ namespace TrainingTask.Models
         [Required]
         public string ShortName { get; set; }
         public string Description { get; set; }
-        public List<TaskViewModel> Tasks { get; set; }
+        public ICollection<TaskViewModel> Tasks { get; set; }
     }
 }

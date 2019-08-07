@@ -15,7 +15,7 @@ namespace DLayer.Entities
         public  Status TypeStatus { get; set; }
         public Project Project { get; set; }
         [NotMapped]
-        public List<EmployeeTasks> EmployeeTasks { get; set; }
+        public ICollection<EmployeeTasks> EmployeeTasks { get; set; }
         public int? ProjectId { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using BLayer.DTO;
 using BLayer.Interfaces;
@@ -22,13 +23,12 @@ namespace TrainingTask.Controllers
         private IMapper<ProjectDTO, ProjectViewModel> _projectMapper;
         private IMapper<EmployeeDTO, EmployeeViewModel> _employeeMapper;
         private ILogger<TaskController> _logger;
-        private IExportToXML<TaskViewModel> _exportToXML;
+        private IExportToXML<TaskDTO> _exportToXML;
+        private IExportToExcel<TaskDTO> _exportToExcel;
         public TaskController(IService<TaskDTO> taskService, IService<ProjectDTO> projectService,
             IService<EmployeeDTO> employeeService, IMapper<ProjectDTO, ProjectViewModel> projectMapper,
-            IMapper<EmployeeDTO, EmployeeViewModel> employeeMapper,
-            IMapper<TaskDTO, TaskViewModel> taskMapper,
-            ILogger<TaskController> logger,
-            IExportToXML<TaskViewModel> exportToXML)
+            IMapper<EmployeeDTO, EmployeeViewModel> employeeMapper,IMapper<TaskDTO, TaskViewModel> taskMapper,
+            ILogger<TaskController> logger,IExportToXML<TaskDTO> exportToXML, IExportToExcel<TaskDTO> exportToExcel)
         {
             _projectService = projectService;
             _employeeService = employeeService;
@@ -38,7 +38,8 @@ namespace TrainingTask.Controllers
             _employeeMapper = employeeMapper;
             _logger = logger;
             _exportToXML = exportToXML;
-        }
+            _exportToExcel = exportToExcel;
+    }
 
         public IActionResult Index(int page = 1)
         {
@@ -272,18 +273,12 @@ namespace TrainingTask.Controllers
         }
         public IActionResult UploadToXML()
         {
+            MemoryStream memoryStream;
+
             try
             {
                 var tasksDTO = _taskService.GetAll();
-                var tasksVM = new List<TaskViewModel>();
-
-                foreach (var taskDTO in tasksDTO)
-                {
-                    var taskVM = _taskMapper.Map(taskDTO);
-                    tasksVM.Add(taskVM);
-                }
-
-                _exportToXML.ExportToXML(tasksVM);
+                memoryStream = _exportToXML.Export(tasksDTO);
 
             }
             catch (Exception ex)
@@ -292,7 +287,23 @@ namespace TrainingTask.Controllers
                 throw;
             }
 
-            return RedirectToAction("Index");
+            return File(memoryStream.ToArray(), "application/xml", "Projects.xml");
+        }
+
+        public IActionResult UploadToExcel()
+        {
+            IEnumerable<TaskDTO> tasksDTO;
+            try
+            {
+                tasksDTO = _taskService.GetAll();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, "Stopped program because of exception ");
+                throw;
+            }
+
+            return File(_exportToExcel.Export(tasksDTO).ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", @"Tasks.xlsx");
         }
     }
 }

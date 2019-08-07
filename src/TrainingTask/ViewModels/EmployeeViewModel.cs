@@ -17,7 +17,7 @@ namespace TrainingTask.Models
         public string SecondName { get; set; }
         [Required]
         public string Position { get; set; }
-        public List<EmployeeTasksViewModel> EmployeeTasks { get; set; }
+        public ICollection<EmployeeTasksViewModel> EmployeeTasks { get; set; }
         [XmlIgnore]
         public IFormFile UploadedFile { get; set; }
         public string FilePath { get; set; }

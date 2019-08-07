@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using AutoMapper;
 using BLayer.DTO;
 using BLayer.Interfaces;
 using Core.Interfaces;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 using TrainingTask.Mapper;
 using TrainingTask.Models;
 using TrainingTask.ViewModels;
@@ -20,12 +24,13 @@ namespace TrainingTask.Controllers
         private IMapper<ProjectDTO, ProjectViewModel> _projectMapper;
         private IMapper<TaskDTO, TaskViewModel> _taskMapper;
         private ILogger<ProjectController> _logger;
-        private IExportToXML<ProjectViewModel> _exportToXML;
+        private IExportToXML<ProjectDTO> _exportToXML;
         private IExportToExcel<ProjectDTO> _exportToExcel;
+        private IHostingEnvironment _hostingEnvironment;
         public ProjectController(IService<ProjectDTO> projectService, IService<TaskDTO> taskService,
             IMapper<ProjectDTO, ProjectViewModel> projectMapper, IMapper<TaskDTO, TaskViewModel> taskMapper,
-            ILogger<ProjectController> logger, IExportToXML<ProjectViewModel> exportToXML,
-            IExportToExcel<ProjectDTO> exportToExcel)
+            ILogger<ProjectController> logger, IExportToXML<ProjectDTO> exportToXML,
+            IExportToExcel<ProjectDTO> exportToExcel, IHostingEnvironment hostingEnvironment)
         {
             _projectService = projectService;
             _taskService = taskService;
@@ -34,6 +39,7 @@ namespace TrainingTask.Controllers
             _logger = logger;
             _exportToXML = exportToXML;
             _exportToExcel = exportToExcel;
+            _hostingEnvironment = hostingEnvironment;
         }
         public IActionResult Index(int page = 1)
         {
@@ -174,20 +180,12 @@ namespace TrainingTask.Controllers
 
         public IActionResult UploadToXML()
         {
+            MemoryStream memoryStream;
+
             try
             {
                 var projectsDTO =  _projectService.GetAll();
-                var projectsVM = new List<ProjectViewModel>();
-
-                foreach(var projectDTO in projectsDTO)
-                {
-                    var projectVM = _projectMapper.Map(projectDTO);
-                    projectsVM.Add(projectVM);
-
-                }
-
-                _exportToXML.ExportToXML(projectsVM);
-                
+                memoryStream = _exportToXML.Export(projectsDTO);
             }
             catch(Exception ex)
             {
@@ -195,15 +193,15 @@ namespace TrainingTask.Controllers
                 throw;
             }
 
-            return RedirectToAction("Index");
+            return File(memoryStream.ToArray(), "application/xml", "Projects.xml");
         }
 
-        public IActionResult UploadToExcel()
+        public  IActionResult UploadToExcel()
         {
+            IEnumerable<ProjectDTO> projectsDTO;
             try
             {
-                var projectsDTO = _projectService.GetAll();
-                _exportToExcel.ExportToExcel(projectsDTO);
+                projectsDTO = _projectService.GetAll();
             }
             catch (Exception ex)
             {
@@ -211,7 +209,7 @@ namespace TrainingTask.Controllers
                 throw;
             }
 
-            return RedirectToAction("Index");
+            return File(_exportToExcel.Export(projectsDTO).ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", @"Projects.xlsx");
         }
 
         public IActionResult Privacy()

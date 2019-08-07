@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using TrainingTask.Models;
 using TrainingTask.ViewModels;
 
@@ -16,14 +17,16 @@ namespace TrainingTask.Controllers
         private IService<EmployeeDTO> _employeeService;
         private IMapper<EmployeeDTO,EmployeeViewModel> _employeeMapper;
         private ILogger<EmployeeController> _logger;
-        private IExportToXML<EmployeeViewModel> _exportToXML;
+        private IExportToXML<EmployeeDTO> _exportToXML;
+        private IExportToExcel<EmployeeDTO> _exportToExcel;
         public EmployeeController(IService<EmployeeDTO> employeeService, IMapper<EmployeeDTO, EmployeeViewModel> employeeMapper,
-            ILogger<EmployeeController> logger, IExportToXML<EmployeeViewModel> exportToXML)
+            ILogger<EmployeeController> logger, IExportToXML<EmployeeDTO> exportToXML, IExportToExcel<EmployeeDTO> exportToExcel)
         {
             _employeeService = employeeService;
             _employeeMapper = employeeMapper;
             _logger = logger;
             _exportToXML = exportToXML;
+            _exportToExcel = exportToExcel;
         }
         [HttpGet()]
         public IActionResult Index(int page = 1)
@@ -154,38 +157,38 @@ namespace TrainingTask.Controllers
 
         public IActionResult UploadToXML()
         {
+            MemoryStream memoryStream;
+
             try
             {
                 var employeesDTO = _employeeService.GetAll();
-                var eployeesVM = new List<EmployeeViewModel>();
-
-                foreach (var employeeDTO in employeesDTO)
-                {
-                    var employeeVM = _employeeMapper.Map(employeeDTO);
-                    eployeesVM.Add(employeeVM);
-                }
-
-                _exportToXML.ExportToXML(eployeesVM);
+                memoryStream = _exportToXML.Export(employeesDTO);
             }
             catch(Exception ex)
             {
                 _logger.LogError(ex.Message, "Stopped program because of exception");
                 throw;
             }
-            return RedirectToAction("Index");
+
+            return File(memoryStream.ToArray(), "application/xml", "Projects.xml");
         }
 
         public IActionResult UploadToExcel()
         {
+            IEnumerable<EmployeeDTO> employeesDTO;
             try
             {
+                employeesDTO = _employeeService.GetAll();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message, "Stopped program because of exception");
                 throw;
             }
-            return RedirectToAction("Index");
+
+            return File(_exportToExcel.Export(employeesDTO).ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", @"Employees.xlsx");
         }
+
+
     }
 }
