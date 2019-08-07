@@ -1,6 +1,7 @@
 ﻿
 using DLayer.Entities;
 using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
@@ -15,8 +16,7 @@ namespace BLayer.DTO
         public string Position { get; set; }
         [XmlIgnore]
         public IFormFile UploadedFile { get; set; }
-        public string FilePath { get; set; }
-        [WebGet]
+        public string FilePath { get; set; } 
         public ICollection<EmployeeTasksDTO> EmployeeTasks { get; set; }
     }
 }

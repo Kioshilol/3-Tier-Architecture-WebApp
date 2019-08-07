@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace BLayer
@@ -13,13 +16,18 @@ namespace BLayer
     {
         public MemoryStream Export(IEnumerable<T> collection)
         {
+            Type type = collection.GetType();
             var stream = new MemoryStream();
-            Type type = typeof(T);
-            XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
 
-            foreach (var item in collection)
+            DataContractSerializer serializer = new DataContractSerializer(type);
+
+            using (XmlTextWriter writer = new XmlTextWriter(stream, null))
             {
-                xmlSerializer.Serialize(stream, item);
+                writer.Formatting = Formatting.Indented;
+                foreach (var item in collection)
+                {
+                    serializer.WriteObject(writer, item);
+                }
             }
 
             return stream;
