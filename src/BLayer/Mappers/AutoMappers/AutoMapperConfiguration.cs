@@ -6,7 +6,7 @@ namespace BLayer.Mappers.AutoMappers
 {
     public class AutoMapperConfiguration
     {
-        protected  MapperConfiguration GetConfiguration()
+        protected IMapper GetConfiguration()
         {
             var config = new MapperConfiguration(cfg => {
                 cfg.CreateMap<EmployeeDTO, Employee>();
@@ -18,7 +18,8 @@ namespace BLayer.Mappers.AutoMappers
                 cfg.CreateMap<TaskDTO, Task>().ForMember(dest => dest.EmployeeTasks, act => act.MapFrom(src => src.EmployeeTasks));
                 cfg.CreateMap<Task, TaskDTO>().ForMember(dest => dest.EmployeeTasks, act => act.MapFrom(src => src.EmployeeTasks)); ;
             });
-            return config;
+            IMapper iMapper = config.CreateMapper();
+            return iMapper;
         }
     }
 }

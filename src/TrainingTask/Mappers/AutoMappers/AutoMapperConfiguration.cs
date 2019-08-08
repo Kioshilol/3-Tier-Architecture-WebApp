@@ -7,7 +7,7 @@ namespace TrainingTask.Mappers.AutoMappers
 {
     public class AutoMapperConfiguration
     {
-        protected  MapperConfiguration GetConfiguration()
+        protected IMapper GetConfiguration()
         {
             var config = new MapperConfiguration(cfg => {
                 cfg.CreateMap<EmployeeViewModel, EmployeeDTO>();
@@ -19,7 +19,8 @@ namespace TrainingTask.Mappers.AutoMappers
                 cfg.CreateMap<TaskViewModel, TaskDTO>().ForMember(dest => dest.EmployeeTasks, act => act.MapFrom(src => src.EmployeeTasks));
                 cfg.CreateMap<TaskDTO, TaskViewModel>().ForMember(dest => dest.EmployeeTasks, act => act.MapFrom(src => src.EmployeeTasks));
             });
-            return config;
+            IMapper iMapper = config.CreateMapper();
+            return iMapper;
         }
     }
 }

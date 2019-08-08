@@ -10,14 +10,12 @@ namespace TrainingTask.AutoMappers
     {
         public TaskDTO Map(TaskViewModel taskViewModel)
         {
-            IMapper iMapper = GetConfiguration().CreateMapper();
-            return iMapper.Map<TaskViewModel, TaskDTO>(taskViewModel);
+            return GetConfiguration().Map<TaskViewModel, TaskDTO>(taskViewModel);
         }
 
         public TaskViewModel Map(TaskDTO taskDTO)
         {
-            IMapper iMapper = GetConfiguration().CreateMapper();
-            return iMapper.Map<TaskDTO, TaskViewModel>(taskDTO);
+            return GetConfiguration().Map<TaskDTO, TaskViewModel>(taskDTO);
         }
     }
 }

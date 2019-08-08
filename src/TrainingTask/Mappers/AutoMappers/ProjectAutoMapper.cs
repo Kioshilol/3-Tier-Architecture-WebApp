@@ -10,14 +10,12 @@ namespace TrainingTask.AutoMappers
     {
         public ProjectDTO Map(ProjectViewModel projectViewModel)
         {
-            IMapper iMapper = GetConfiguration().CreateMapper();
-            return iMapper.Map<ProjectViewModel, ProjectDTO>(projectViewModel);
+            return GetConfiguration().Map<ProjectViewModel, ProjectDTO>(projectViewModel);
         }
 
         public ProjectViewModel Map(ProjectDTO projectDTO)
         {
-            IMapper iMapper = GetConfiguration().CreateMapper();
-            return iMapper.Map<ProjectDTO, ProjectViewModel>(projectDTO);
+            return GetConfiguration().Map<ProjectDTO, ProjectViewModel>(projectDTO);
         }
     }
 }

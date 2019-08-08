@@ -9,14 +9,12 @@ namespace BLayer.Mappers.AutoMappers
     {
         public TaskDTO Map(Task task)
         {
-            IMapper iMapper = GetConfiguration().CreateMapper();
-            return iMapper.Map<Task, TaskDTO>(task);
+            return GetConfiguration().Map<Task, TaskDTO>(task);
         }
 
         public Task Map(TaskDTO taskDTO)
         {
-            IMapper iMapper = GetConfiguration().CreateMapper();
-            return iMapper.Map<TaskDTO, Task>(taskDTO);
+            return GetConfiguration().Map<TaskDTO, Task>(taskDTO);
         }
     }
 }

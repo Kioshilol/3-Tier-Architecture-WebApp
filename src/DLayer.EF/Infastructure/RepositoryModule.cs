@@ -12,7 +12,7 @@ namespace DLayer.EFContext
     {
         public static void AddServiceRepository(this IServiceCollection services)
         {
-            if (AppSetting.EfConnect())
+            if (AppSetting.IsEfConnect())
             {
                 services.AddTransient<IEmployeeRepository<Employee>, EmployeeEfRepository>();
                 services.AddTransient<IRepository<Project>, ProjectEFRepository>();

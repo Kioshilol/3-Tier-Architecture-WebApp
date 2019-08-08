@@ -10,6 +10,7 @@ namespace TrainingTask.ViewModels
 {
     public class EmployeeTasksViewModel
     {
+        [XmlIgnore]
         public int? EmployeeId { get; set; }
         [XmlIgnore]
         public int? TaskId { get; set; }

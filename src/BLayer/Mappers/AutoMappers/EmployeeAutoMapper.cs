@@ -9,14 +9,12 @@ namespace BLayer.Mappers.AutoMappers
     {
         public EmployeeDTO Map(Employee employee)
         {
-            IMapper iMapper = GetConfiguration().CreateMapper();
-            return iMapper.Map<Employee, EmployeeDTO>(employee);
+            return GetConfiguration().Map<Employee, EmployeeDTO>(employee);
         }
 
         public Employee Map(EmployeeDTO employeeDTO)
         {
-            IMapper iMapper = GetConfiguration().CreateMapper();
-            return iMapper.Map<EmployeeDTO, Employee>(employeeDTO);
+            return GetConfiguration().Map<EmployeeDTO, Employee>(employeeDTO);
         }
     }
 }

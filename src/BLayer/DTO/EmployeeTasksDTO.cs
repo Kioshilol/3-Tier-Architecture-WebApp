@@ -9,7 +9,6 @@ namespace BLayer.DTO
 {
     public class EmployeeTasksDTO
     {
-        [XmlIgnore]
         public int? EmployeeId { get; set; }
         [XmlIgnore]
         public int? TaskId { get; set; }

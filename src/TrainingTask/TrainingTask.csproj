@@ -25,11 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\files\ExcelFiles\" />
-    <Folder Include="wwwroot\files\XMLFiles\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Update="nlog.config" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 

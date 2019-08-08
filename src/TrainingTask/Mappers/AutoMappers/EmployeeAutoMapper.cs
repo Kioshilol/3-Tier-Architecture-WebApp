@@ -10,14 +10,12 @@ namespace TrainingTask.AutoMappers
     {
         public EmployeeDTO Map(EmployeeViewModel employeeViewModel)
         {
-            IMapper iMapper = GetConfiguration().CreateMapper();
-            return iMapper.Map<EmployeeViewModel, EmployeeDTO>(employeeViewModel);
+            return GetConfiguration().Map<EmployeeViewModel, EmployeeDTO>(employeeViewModel);
         }
 
         public EmployeeViewModel Map(EmployeeDTO employeeDTO)
         {
-            IMapper iMapper = GetConfiguration().CreateMapper();
-            return iMapper.Map<EmployeeDTO, EmployeeViewModel>(employeeDTO);
+            return GetConfiguration().Map<EmployeeDTO, EmployeeViewModel>(employeeDTO);
         }
     }
 }
