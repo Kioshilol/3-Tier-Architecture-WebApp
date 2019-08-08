@@ -17,16 +17,19 @@ namespace BLayer
         public MemoryStream Export(IEnumerable<T> collection)
         {
             Type type = collection.GetType();
-            var stream = new MemoryStream();
-
+            MemoryStream stream;
             DataContractSerializer serializer = new DataContractSerializer(type);
 
-            using (XmlTextWriter writer = new XmlTextWriter(stream, null))
+            using(stream = new MemoryStream())
             {
-                writer.Formatting = Formatting.Indented;
-                foreach (var item in collection)
+                using (XmlTextWriter writer = new XmlTextWriter(stream, null))
                 {
-                    serializer.WriteObject(writer, item);
+                    writer.Formatting = Formatting.Indented;
+
+                    foreach (var item in collection)
+                    {
+                        serializer.WriteObject(writer, item);
+                    }
                 }
             }
 

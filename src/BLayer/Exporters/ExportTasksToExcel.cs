@@ -9,63 +9,40 @@ using System.Text;
 
 namespace BLayer.Exporters
 {
-    public class ExportTasksToExcel : IExportToExcel<TaskDTO>
+    public class ExportTasksToExcel : BaseExcelExporter, IExportToExcel<TaskDTO>
     {
         public MemoryStream Export(IEnumerable<TaskDTO> collection)
         {
-            var stream = new MemoryStream();
-            Type type = typeof(ProjectDTO);
-            PropertyInfo[] propertyInfos = type.GetProperties();
+            MemoryStream stream;
+            Type type = typeof(TaskDTO);
             ExcelPackage excelPackage = new ExcelPackage();
             ExcelWorksheet excelWorksheet = excelPackage.Workbook.Worksheets.Add($"{type.Name}");
-            int column = 1;
             int row = 1;
-            int count = 1;
-            int i;
 
-            foreach (var property in propertyInfos)
+            using (stream = new MemoryStream())
             {
-                excelWorksheet.Cells[row, count].Value = property.Name;
-                count++;
-            }
-            row++;
-
-            foreach (var item in collection)
-            {
-                var totalTasks = item.EmployeeTasks.Count;
-                excelWorksheet.Cells[row, column].Value = item.Id;
-                excelWorksheet.Cells[row, column, row + totalTasks - 1, column].Merge = true;
-                column++;
-                excelWorksheet.Cells[row, column].Value = item.Name;
-                excelWorksheet.Cells[row, column, row + totalTasks - 1, column].Merge = true;
-                column++;
-                excelWorksheet.Cells[row, column].Value = item.Project.Name;
-                excelWorksheet.Cells[row, column, row + totalTasks - 1, column].Merge = true;
-                column++;
-                excelWorksheet.Cells[row, column].Value = item.TaskTime;
-                excelWorksheet.Cells[row, column, row + totalTasks - 1, column].Merge = true;
-                column++;
-                excelWorksheet.Cells[row, column].Value = item.TaskTime;
-                excelWorksheet.Cells[row, column, row + totalTasks - 1, column].Merge = true;
-                column++;
-                excelWorksheet.Cells[row, column].Value = item.TypeStatus;
-                excelWorksheet.Cells[row, column, row + totalTasks - 1, column].Merge = true;
-                column++;
-                excelWorksheet.Cells[row, column].Value = item.DateOfStart;
-                excelWorksheet.Cells[row, column, row + totalTasks - 1, column].Merge = true;
-                column++;
-                excelWorksheet.Cells[row, column].Value = item.DateOfEnd;
-                excelWorksheet.Cells[row, column, row + totalTasks - 1, column].Merge = true;
-                column++;
-                foreach (var employeeTasks in item.EmployeeTasks)
+                foreach (var item in collection)
                 {
-                    excelWorksheet.Cells[row, column].Value = employeeTasks.Employee.Name;
-                    row++;
+                    var column = 1;
+                    var totalTasks = item.EmployeeTasks.Count;
+                    column = FillCell(excelWorksheet, item.Id, row, column, totalTasks);
+                    column = FillCell(excelWorksheet, item.Name, row, column, totalTasks);
+                    column = FillCell(excelWorksheet, item.DateOfStart, row, column, totalTasks);
+                    column = FillCell(excelWorksheet, item.DateOfEnd, row, column, totalTasks);
+                    column = FillCell(excelWorksheet, item.TaskTime, row, column, totalTasks);
+                    column = FillCell(excelWorksheet, item.TypeStatus, row, column, totalTasks);
+                    column = FillCell(excelWorksheet, item.Project.Name, row, column, totalTasks);
+
+                    foreach (var employeeTasks in item.EmployeeTasks)
+                    {
+                        excelWorksheet.Cells[row, column].Value = employeeTasks.Employee.Name;
+                        row++;
+                    }
                 }
-                column = 1;
+
+                excelPackage.SaveAs(stream);
             }
 
-            excelPackage.SaveAs(stream);
             return stream;
         }
     }

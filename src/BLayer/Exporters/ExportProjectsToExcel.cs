@@ -10,51 +10,38 @@ using System.Reflection;
 
 namespace BLayer.Exporters
 {
-    public class ExportProjectsToExcel : IExportToExcel<ProjectDTO>
+    public class ExportProjectsToExcel : BaseExcelExporter, IExportToExcel<ProjectDTO>
     {
         public MemoryStream Export(IEnumerable<ProjectDTO> collection)
         {
-            var stream = new MemoryStream();
+            MemoryStream stream;
             Type type = typeof(ProjectDTO);
-            PropertyInfo[] propertyInfos = type.GetProperties();
             ExcelPackage excelPackage = new ExcelPackage();
             ExcelWorksheet excelWorksheet = excelPackage.Workbook.Worksheets.Add($"{type.Name}");
-            int column = 1;
             int row = 1;
-            int count = 1;
-            int i;
 
-            foreach (var property in propertyInfos)
+            using (stream = new MemoryStream())
             {
-                excelWorksheet.Cells[row, count].Value = property.Name;
-                count++;
-            }
-            row++;
 
-            foreach (var item in collection)
-            {
-                var totalTasks = item.Tasks.Count;
-                excelWorksheet.Cells[row, column].Value = item.Id;
-                excelWorksheet.Cells[row, column, row + totalTasks - 1, column].Merge = true;
-                column++;
-                excelWorksheet.Cells[row, column].Value = item.Name;
-                excelWorksheet.Cells[row, column, row  + totalTasks - 1, column].Merge = true;
-                column++;
-                excelWorksheet.Cells[row, column].Value = item.ShortName;
-                excelWorksheet.Cells[row, column, row  + totalTasks - 1, column].Merge = true;
-                column++;
-                excelWorksheet.Cells[row, column].Value = item.Description;
-                excelWorksheet.Cells[row, column, row  + totalTasks - 1, column].Merge = true;
-                column++;
-                foreach (var task in item.Tasks)
+                foreach (var item in collection)
                 {
-                    excelWorksheet.Cells[row, column].Value = task.Name;
-                    row++;
+                    var column = 1;
+                    var totalTasks = item.Tasks.Count;
+                    column = FillCell(excelWorksheet, item.Id, row, column, totalTasks);
+                    column = FillCell(excelWorksheet, item.Name, row, column, totalTasks);
+                    column = FillCell(excelWorksheet, item.ShortName, row, column, totalTasks);
+                    column = FillCell(excelWorksheet, item.Description, row, column, totalTasks);
+
+                    foreach (var task in item.Tasks)
+                    {
+                        excelWorksheet.Cells[row, column].Value = task.Name;
+                        row++;
+                    }
                 }
-                column = 1;
+
+                excelPackage.SaveAs(stream);
             }
 
-            excelPackage.SaveAs(stream);
             return stream;
         }
     }

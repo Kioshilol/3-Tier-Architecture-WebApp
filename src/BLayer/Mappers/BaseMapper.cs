@@ -10,7 +10,7 @@ using System.Xml;
 
 namespace BLayer
 {
-    public class BaseMapper
+    public abstract class BaseMapper
     {
         protected IEnumerable<U> Map<T, U>(IMapper<T, U> mapper, IEnumerable<T> list)
         {

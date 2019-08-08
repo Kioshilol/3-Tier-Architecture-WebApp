@@ -4,7 +4,7 @@ using DLayer.Entities;
 
 namespace BLayer.Mappers.AutoMappers
 {
-    public class AutoMapperConfiguration
+    public abstract class AutoMapperConfiguration
     {
         protected IMapper GetConfiguration()
         {
