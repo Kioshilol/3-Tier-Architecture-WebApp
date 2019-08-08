@@ -32,36 +32,46 @@ namespace TrainingTask.Controllers
         public IActionResult Index(int page = 1)
         {
             _logger.LogInformation($"{page}");
-            var employeesVM = new List<EmployeeViewModel>();
-            var employeesDTO = _employeeService.GetAllWithPaging(page);
-            var allEmployeeVM = new List<EmployeeViewModel>();
-            var allEmployeesDTO = _employeeService.GetAll();
+            IndexViewModel<EmployeeViewModel> indexViewModel;
 
-            foreach(var employeeDTO in allEmployeesDTO)
+            try
             {
-                var employeeVM = _employeeMapper.Map(employeeDTO);
-                allEmployeeVM.Add(employeeVM);
+                var employeesVM = new List<EmployeeViewModel>();
+                var employeesDTO = _employeeService.GetAllWithPaging(page);
+                var allEmployeeVM = new List<EmployeeViewModel>();
+                var allEmployeesDTO = _employeeService.GetAll();
+
+                foreach (var employeeDTO in allEmployeesDTO)
+                {
+                    var employeeVM = _employeeMapper.Map(employeeDTO);
+                    allEmployeeVM.Add(employeeVM);
+                }
+
+                foreach (var employee in employeesDTO)
+                {
+                    var employeeVM = _employeeMapper.Map(employee);
+                    employeesVM.Add(employeeVM);
+                }
+
+                var pageViewModel = new PageViewModel
+                {
+                    PageNumber = page,
+                    RowsPerPage = PageSetting.GetRowsPerPage(),
+                    TotalRecords = allEmployeeVM.Count,
+                    TotalPages = PageSetting.GetTotalPages(allEmployeeVM)
+                };
+
+                indexViewModel = new IndexViewModel<EmployeeViewModel>
+                {
+                    ViewModelList = employeesVM,
+                    Page = pageViewModel
+                };
             }
-
-            foreach (var employee in employeesDTO)
+            catch (Exception ex)
             {
-                var employeeVM = _employeeMapper.Map(employee);
-                employeesVM.Add(employeeVM);
+                _logger.LogError(ex.Message, "Stopped program because of exception");
+                throw;
             }
-
-            var pageViewModel = new PageViewModel
-            {
-                PageNumber = page,
-                RowsPerPage = PageSetting.GetRowsPerPage(),
-                TotalRecords = allEmployeeVM.Count,
-                TotalPages = PageSetting.GetTotalPages(allEmployeeVM)
-            };
-
-            var indexViewModel = new IndexViewModel<EmployeeViewModel>
-            {
-                ViewModelList = employeesVM,
-                Page = pageViewModel
-            };
 
             return View(indexViewModel);
         }
@@ -71,12 +81,22 @@ namespace TrainingTask.Controllers
             _logger.LogInformation($"{id}");
             if (id.HasValue)
             {
-                var employeeDTO = _employeeService.GetById(id.Value);
-                if(employeeDTO != null)
+                try
                 {
-                    var employeeViewModel = _employeeMapper.Map(employeeDTO);
-                    return View(employeeViewModel);
+                    var employeeDTO = _employeeService.GetById(id.Value);
+
+                    if (employeeDTO != null)
+                    {
+                        var employeeViewModel = _employeeMapper.Map(employeeDTO);
+                        return View(employeeViewModel);
+                    }
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message, "Stopped program because of exception");
+                    throw;
+                }
+
                 return NotFound();
             }
             else
@@ -89,12 +109,21 @@ namespace TrainingTask.Controllers
         public IActionResult Edit(EmployeeViewModel employee)
         {
             _logger.LogInformation($"{employee}");
+
             if (employee.Id.HasValue)
             {
                 if (ModelState.IsValid)
                 {
-                    var employeeDTO = _employeeMapper.Map(employee);
-                    _employeeService.Edit(employeeDTO);
+                    try
+                    {
+                        var employeeDTO = _employeeMapper.Map(employee);
+                        _employeeService.Edit(employeeDTO);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex.Message, "Stopped program because of exception");
+                        throw;
+                    }
                 }
                 else
                     return View(employee);
@@ -103,27 +132,47 @@ namespace TrainingTask.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var employeeDTO = _employeeMapper.Map(employee);
-                    _employeeService.Add(employeeDTO);
+                    try
+                    {
+                        var employeeDTO = _employeeMapper.Map(employee);
+                        _employeeService.Add(employeeDTO);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex.Message, "Stopped program because of exception");
+                        throw;
+                    }
                 }
                 else
                     return View(employee);
             }
+
             return RedirectToAction("Index");
         }
 
         public IActionResult Delete(int? id)
         {
             _logger.LogInformation($"{id}");
+
             if (id != null) 
             {
-                var employeeDTO = _employeeService.GetById(id.Value);
-                if (employeeDTO != null)
+                try
                 {
-                    var employeeViewModel = _employeeMapper.Map(employeeDTO);
-                    return View(employeeViewModel);
+                    var employeeDTO = _employeeService.GetById(id.Value);
+
+                    if (employeeDTO != null)
+                    {
+                        var employeeViewModel = _employeeMapper.Map(employeeDTO);
+                        return View(employeeViewModel);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message, "Stopped program because of exception");
+                    throw;
                 }
             }
+
             return NotFound();
         }
 
@@ -131,27 +180,48 @@ namespace TrainingTask.Controllers
         public IActionResult DeleteConfirmed(int? id)
         {
             _logger.LogInformation($"{id}");
+
             if (id != null)
             {
-                _employeeService.Delete(id.Value);
+                try
+                {
+                    _employeeService.Delete(id.Value);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message, "Stopped program because of exception");
+                    throw;
+                }
+
                 return RedirectToAction("Index");
             }
+
             return NotFound();
         }
 
         public IActionResult Details(int? id)
         {
             _logger.LogInformation($"{id}");
+
             if (id != null)
             {
-                var employeeDTO = _employeeService.GetById(id.Value);
-                if (employeeDTO != null)
+                try
                 {
+                    var employeeDTO = _employeeService.GetById(id.Value);
 
-                    var employeeViewModel = _employeeMapper.Map(employeeDTO);
-                    return View(employeeViewModel);
+                    if (employeeDTO != null)
+                    {
+                        var employeeViewModel = _employeeMapper.Map(employeeDTO);
+                        return View(employeeViewModel);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message, "Stopped program because of exception");
+                    throw;
                 }
             }
+
             return NotFound();
         }
 
@@ -176,6 +246,7 @@ namespace TrainingTask.Controllers
         public IActionResult UploadToExcel()
         {
             IEnumerable<EmployeeDTO> employeesDTO;
+
             try
             {
                 employeesDTO = _employeeService.GetAll();

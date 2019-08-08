@@ -17,6 +17,7 @@ namespace TrainingTask.ViewModels
             int rowsPerPage = AppSetting.GetPageSize();
             var rest = recordsNumber % rowsPerPage;
             int totalPages;
+
             if (rest > 0)
                 totalPages = (recordsNumber / rowsPerPage) + 1;
             else

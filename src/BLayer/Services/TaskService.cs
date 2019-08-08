@@ -155,6 +155,7 @@ namespace BLayer.Services
             foreach (var taskDTO in tasksDTO)
             {
                 var employeesDTO = Map(_employeeMapper, _dataBase.Employees.GetEmployeesByTaskId(taskDTO.Id));
+
                 foreach (var employee in employeesDTO)
                 {
                     taskDTO.EmployeeTasks.Add(new EmployeeTasksDTO { Employee = employee });
@@ -164,6 +165,7 @@ namespace BLayer.Services
             foreach(var taskDTO in tasksDTO)
             {
                 var projectsDTO = Map(_projectMapper, _dataBase.Projects.GetAll());
+
                 foreach(var projectDTO in projectsDTO)
                 {
                     if(taskDTO.ProjectId == projectDTO.Id)

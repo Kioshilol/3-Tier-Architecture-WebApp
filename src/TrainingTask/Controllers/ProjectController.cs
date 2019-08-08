@@ -44,37 +44,48 @@ namespace TrainingTask.Controllers
         public IActionResult Index(int page = 1)
         {
             _logger.LogInformation($"{page}");
-            var allProjectsVM = new List<ProjectViewModel>();
-            var allProjects = _projectService.GetAll();
+            IndexViewModel<ProjectViewModel> indexViewModel;
 
-            foreach (var project in allProjects)
+            try
             {
-                var projectViewModel = _projectMapper.Map(project);
-                allProjectsVM.Add(projectViewModel);
+                var allProjectsVM = new List<ProjectViewModel>();
+                var allProjects = _projectService.GetAll();
+
+                foreach (var project in allProjects)
+                {
+                    var projectViewModel = _projectMapper.Map(project);
+                    allProjectsVM.Add(projectViewModel);
+                }
+
+                var projects = _projectService.GetAllWithPaging(page);
+                var projectsVM = new List<ProjectViewModel>();
+
+                foreach (var project in projects)
+                {
+                    var projectViewModel = _projectMapper.Map(project);
+                    projectsVM.Add(projectViewModel);
+                }
+
+                var pageViewModel = new PageViewModel
+                {
+                    PageNumber = page,
+                    RowsPerPage = PageSetting.GetRowsPerPage(),
+                    TotalRecords = allProjectsVM.Count,
+                    TotalPages = PageSetting.GetTotalPages(allProjectsVM)
+                };
+
+                indexViewModel = new IndexViewModel<ProjectViewModel>
+                {
+                    ViewModelList = projectsVM,
+                    Page = pageViewModel
+                };
+
             }
-
-            var projects = _projectService.GetAllWithPaging(page);
-            var projectsVM = new List<ProjectViewModel>();
-
-            foreach (var project in projects)
+            catch (Exception ex)
             {
-                var projectViewModel = _projectMapper.Map(project);
-                projectsVM.Add(projectViewModel);
+                _logger.LogError(ex.Message, "Stopped program because of exception ");
+                throw;
             }
-
-            var pageViewModel = new PageViewModel
-            {
-                PageNumber = page,
-                RowsPerPage = PageSetting.GetRowsPerPage(),
-                TotalRecords = allProjectsVM.Count,
-                TotalPages = PageSetting.GetTotalPages(allProjectsVM)
-            };
-
-            var indexViewModel = new IndexViewModel<ProjectViewModel>
-            {
-                ViewModelList = projectsVM,
-                Page = pageViewModel
-            };
 
             return View(indexViewModel);
         }
@@ -85,15 +96,24 @@ namespace TrainingTask.Controllers
 
             if (id.HasValue)
             {
-                var projectDTO = _projectService.GetById(id.Value);
-                if(projectDTO != null)
+                try
                 {
-                    var projectModelView = _projectMapper.Map(projectDTO);
-                    return View(projectModelView);
+                    var projectDTO = _projectService.GetById(id.Value);
+
+                    if (projectDTO != null)
+                    {
+                        var projectModelView = _projectMapper.Map(projectDTO);
+                        return View(projectModelView);
+                    }
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message, "Stopped program because of exception ");
+                    throw;
+                }
+
                 return NotFound();
             }
-
             else
             {
                 return View(new ProjectViewModel());
@@ -109,19 +129,34 @@ namespace TrainingTask.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var projectDTO = _projectMapper.Map(project);
-                    _projectService.Edit(projectDTO);
+                    try
+                    {
+                        var projectDTO = _projectMapper.Map(project);
+                        _projectService.Edit(projectDTO);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex.Message, "Stopped program because of exception ");
+                        throw;
+                    }
                 }
                 else
                     return View(project);
             }
-
             else
             {
                 if (ModelState.IsValid)
                 {
-                    var projectDTO = _projectMapper.Map(project);
-                    _projectService.Add(projectDTO);
+                    try
+                    {
+                        var projectDTO = _projectMapper.Map(project);
+                        _projectService.Add(projectDTO);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex.Message, "Stopped program because of exception ");
+                        throw;
+                    }
                 }
                 else
                     return View(project);
@@ -136,11 +171,20 @@ namespace TrainingTask.Controllers
 
             if (id != null)
             {
-                var projectDTO = _projectService.GetById(id.Value);
-                if (projectDTO != null)
+                try
                 {
-                    var projectModelView = _projectMapper.Map(projectDTO);
-                    return View(projectModelView);
+                    var projectDTO = _projectService.GetById(id.Value);
+
+                    if (projectDTO != null)
+                    {
+                        var projectModelView = _projectMapper.Map(projectDTO);
+                        return View(projectModelView);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message, "Stopped program because of exception ");
+                    throw;
                 }
             }
 
@@ -156,7 +200,7 @@ namespace TrainingTask.Controllers
             {
                 _projectService.Delete(id);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.Message, "Stopped program because of exception ");
                 throw;
@@ -164,16 +208,24 @@ namespace TrainingTask.Controllers
 
             return RedirectToAction("Index");
         }
-        
+
         public IActionResult Details(int? id)
         {
             _logger.LogInformation($"{id}");
 
             if (id != null)
             {
-                var projectDTO = _projectService.GetById(id.Value);
-                var projectModelView = _projectMapper.Map(projectDTO);
-                return View(projectModelView);
+                try
+                {
+                    var projectDTO = _projectService.GetById(id.Value);
+                    var projectModelView = _projectMapper.Map(projectDTO);
+                    return View(projectModelView);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message, "Stopped program because of exception ");
+                    throw;
+                }
             }
             return NotFound();
         }
@@ -184,10 +236,10 @@ namespace TrainingTask.Controllers
 
             try
             {
-                var projectsDTO =  _projectService.GetAll();
+                var projectsDTO = _projectService.GetAll();
                 memoryStream = _exportToXML.Export(projectsDTO);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.Message, "Stopped program because of exception ");
                 throw;
@@ -196,9 +248,10 @@ namespace TrainingTask.Controllers
             return File(memoryStream.ToArray(), "application/xml", "Projects.xml");
         }
 
-        public  IActionResult UploadToExcel()
+        public IActionResult UploadToExcel()
         {
             IEnumerable<ProjectDTO> projectsDTO;
+
             try
             {
                 projectsDTO = _projectService.GetAll();
@@ -215,11 +268,6 @@ namespace TrainingTask.Controllers
         public IActionResult Privacy()
         {
             return View();
-        }
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

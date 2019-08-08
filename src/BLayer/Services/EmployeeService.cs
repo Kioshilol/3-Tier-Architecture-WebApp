@@ -172,6 +172,7 @@ namespace BLayer.Services
             foreach (var employeeDTO in employeesDTO)
             {
                 var tasksDTO = Map(_taskMapper, _dataBase.Tasks.GetTasksByEmployeeId(employeeDTO.Id.Value));
+
                 foreach (var taskDTO in tasksDTO)
                 {
                     var list = new List<TaskDTO>();

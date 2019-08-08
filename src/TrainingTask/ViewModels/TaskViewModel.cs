@@ -24,7 +24,6 @@ namespace TrainingTask.Models
         public DateTime DateOfEnd { get; set; }
         [Required]
         public Status TypeStatus { get; set; }
-        public int[] EmployeeId { get; set; }
         public ICollection<EmployeeTasksViewModel> EmployeeTasks { get; set; }
 
         public TaskViewModel()

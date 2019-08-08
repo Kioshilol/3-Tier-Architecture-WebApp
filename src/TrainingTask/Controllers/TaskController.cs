@@ -44,37 +44,48 @@ namespace TrainingTask.Controllers
         public IActionResult Index(int page = 1)
         {
             _logger.LogInformation($"{page}");
-            var tasksViewModelPaging = new List<TaskViewModel>();
-            var taskListPaging = _taskService.GetAllWithPaging(page);
+            IndexViewModel<TaskViewModel> indexViewModel;
 
-            foreach (var task in taskListPaging)
+            try
             {
-                var taskViewModel = _taskMapper.Map(task);
-                tasksViewModelPaging.Add(taskViewModel);
+                var tasksViewModelPaging = new List<TaskViewModel>();
+                var taskListPaging = _taskService.GetAllWithPaging(page);
+
+                foreach (var task in taskListPaging)
+                {
+                    var taskViewModel = _taskMapper.Map(task);
+                    tasksViewModelPaging.Add(taskViewModel);
+                }
+
+                var tasksViewModel = new List<TaskViewModel>();
+                var taskList = _taskService.GetAll();
+
+                foreach (var task in taskList)
+                {
+                    var taskViewModel = _taskMapper.Map(task);
+                    tasksViewModel.Add(taskViewModel);
+                }
+
+                var pageViewModel = new PageViewModel
+                {
+                    PageNumber = page,
+                    RowsPerPage = PageSetting.GetRowsPerPage(),
+                    TotalRecords = tasksViewModel.Count,
+                    TotalPages = PageSetting.GetTotalPages(tasksViewModel)
+                };
+
+                indexViewModel = new IndexViewModel<TaskViewModel>
+                {
+                    ViewModelList = tasksViewModelPaging,
+                    Page = pageViewModel
+                };
+
             }
-
-            var tasksViewModel = new List<TaskViewModel>();
-            var taskList = _taskService.GetAll();
-
-            foreach(var task in taskList)
+            catch (Exception ex)
             {
-                var taskViewModel = _taskMapper.Map(task);
-                tasksViewModel.Add(taskViewModel);
+                _logger.LogInformation(ex.Message, "Stopped program because of exception ");
+                throw;
             }
-
-            var pageViewModel = new PageViewModel
-            {
-                PageNumber = page,
-                RowsPerPage = PageSetting.GetRowsPerPage(),
-                TotalRecords = tasksViewModel.Count,
-                TotalPages = PageSetting.GetTotalPages(tasksViewModel)
-            };
-
-            var indexViewModel = new IndexViewModel<TaskViewModel>
-            {
-                ViewModelList = tasksViewModelPaging,
-                Page = pageViewModel
-            };
 
             return View(indexViewModel);
         }
@@ -83,41 +94,9 @@ namespace TrainingTask.Controllers
         public IActionResult Create()
         {
             _logger.LogInformation($"Create task");
-            var employeeDTO = _employeeService.GetAll();
-            var employeeViewModel = new List<EmployeeViewModel>();
+            TaskViewModel model;
 
-            foreach (var employee in employeeDTO)
-            {
-                var employeeViewM = _employeeMapper.Map(employee);
-                employeeViewModel.Add(employeeViewM);
-            }
-
-            ViewBag.employee = employeeViewModel;
-            var projectsDTO = _projectService.GetAll();
-            var projectsViewModel = new List<ProjectViewModel>();
-
-            foreach (var project in projectsDTO)
-            {
-                var projectViewModel = _projectMapper.Map(project);
-                projectsViewModel.Add(projectViewModel);
-            }
-
-            SelectList projects = new SelectList(projectsViewModel, "Id", "Name");
-            ViewBag.Projects = projects;
-
-            var model = new TaskViewModel
-            {
-                DateOfEnd = DateTime.UtcNow
-            };
-
-            return View(model);
-        }
-
-        [HttpGet("projects/{projectid}/Create")]
-        public IActionResult Create(int projectid)
-        {
-            _logger.LogInformation($"{projectid}");
-            if (projectid > 0)
+            try
             {
                 var employeeDTO = _employeeService.GetAll();
                 var employeeViewModel = new List<EmployeeViewModel>();
@@ -128,20 +107,72 @@ namespace TrainingTask.Controllers
                     employeeViewModel.Add(employeeViewM);
                 }
 
-                ViewBag.Employee = employeeViewModel;
+                ViewBag.employee = employeeViewModel;
+                var projectsDTO = _projectService.GetAll();
+                var projectsViewModel = new List<ProjectViewModel>();
 
-                var model = new TaskViewModel()
+                foreach (var project in projectsDTO)
+                {
+                    var projectViewModel = _projectMapper.Map(project);
+                    projectsViewModel.Add(projectViewModel);
+                }
+
+                SelectList projects = new SelectList(projectsViewModel, "Id", "Name");
+                ViewBag.Projects = projects;
+
+                model = new TaskViewModel
                 {
                     DateOfEnd = DateTime.UtcNow
                 };
 
-                var projectDto = _projectService.GetById(projectid);
-                if (projectDto != null)
-                {
-                    model.ProjectId = projectid;
-                    model.Project = _projectMapper.Map(projectDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message, "Stopped program because of exception ");
+                throw;
+            }
 
-                    return View(model);
+            return View(model);
+        }
+
+        [HttpGet("projects/{projectid}/Create")]
+        public IActionResult Create(int projectid)
+        {
+            _logger.LogInformation($"{projectid}");
+            if (projectid > 0)
+            {
+                try
+                {
+                    var employeeDTO = _employeeService.GetAll();
+                    var employeeViewModel = new List<EmployeeViewModel>();
+
+                    foreach (var employee in employeeDTO)
+                    {
+                        var employeeViewM = _employeeMapper.Map(employee);
+                        employeeViewModel.Add(employeeViewM);
+                    }
+
+                    ViewBag.Employee = employeeViewModel;
+
+                    var model = new TaskViewModel()
+                    {
+                        DateOfEnd = DateTime.UtcNow
+                    };
+
+                    var projectDto = _projectService.GetById(projectid);
+
+                    if (projectDto != null)
+                    {
+                        model.ProjectId = projectid;
+                        model.Project = _projectMapper.Map(projectDto);
+
+                        return View(model);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogInformation(ex.Message, "Stopped program because of exception ");
+                    throw;
                 }
             }
             return new BadRequestResult();
@@ -154,13 +185,22 @@ namespace TrainingTask.Controllers
 
             if (ModelState.IsValid)
             {
-                foreach(var id in selectedEmployee)
+                try
                 {
-                    task.EmployeeTasks.Add(new EmployeeTasksViewModel { EmployeeId = id });
+                    foreach (var id in selectedEmployee)
+                    {
+                        task.EmployeeTasks.Add(new EmployeeTasksViewModel { EmployeeId = id });
+                    }
+
+                    var taskDTO = _taskMapper.Map(task);
+                    _taskService.Add(taskDTO);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogInformation(ex.Message, "Stopped program because of exception ");
+                    throw;
                 }
 
-                var taskDTO = _taskMapper.Map(task);
-                _taskService.Add(taskDTO);
                 return RedirectToAction("Index");
             }
             else
@@ -174,33 +214,42 @@ namespace TrainingTask.Controllers
 
             if (id != null)
             {
-                var employeeDTO = _employeeService.GetAll();
-                var employeeViewModel = new List<EmployeeViewModel>();
-
-                foreach (var employee in employeeDTO)
+                try
                 {
-                    var employeeViewM = _employeeMapper.Map(employee);
-                    employeeViewModel.Add(employeeViewM);
+                    var employeeDTO = _employeeService.GetAll();
+                    var employeeViewModel = new List<EmployeeViewModel>();
+
+                    foreach (var employee in employeeDTO)
+                    {
+                        var employeeViewM = _employeeMapper.Map(employee);
+                        employeeViewModel.Add(employeeViewM);
+                    }
+
+                    ViewBag.Employee = employeeViewModel;
+
+                    var projectsDTO = _projectService.GetAll();
+                    var projectsViewModel = new List<ProjectViewModel>();
+
+                    foreach (var project in projectsDTO)
+                    {
+                        var projectViewModel = _projectMapper.Map(project);
+                        projectsViewModel.Add(projectViewModel);
+                    }
+
+                    SelectList projects = new SelectList(projectsViewModel, "Id", "Name");
+                    ViewBag.Projects = projects;
+                    var taskDTO = _taskService.GetById(id.Value);
+                    taskDTO.DateOfEnd = DateTime.Now;
+                    var taskModelView = _taskMapper.Map(taskDTO);
+                    return View(taskModelView);
                 }
-
-                ViewBag.Employee = employeeViewModel;
-
-                var projectsDTO = _projectService.GetAll();
-                var projectsViewModel = new List<ProjectViewModel>();
-
-                foreach (var project in projectsDTO)
+                catch (Exception ex)
                 {
-                    var projectViewModel = _projectMapper.Map(project);
-                    projectsViewModel.Add(projectViewModel);
+                    _logger.LogInformation(ex.Message, "Stopped program because of exception ");
+                    throw;
                 }
-
-                SelectList projects = new SelectList(projectsViewModel, "Id", "Name");
-                ViewBag.Projects = projects;
-                var taskDTO = _taskService.GetById(id.Value);
-                taskDTO.DateOfEnd = DateTime.Now;
-                var taskModelView = _taskMapper.Map(taskDTO);
-                return View(taskModelView);
             }
+
             return NotFound();
         }
 
@@ -211,13 +260,22 @@ namespace TrainingTask.Controllers
 
             if (ModelState.IsValid)
             {
-                foreach (var id in selectedEmployee)
+                try
                 {
-                    task.EmployeeTasks.Add(new EmployeeTasksViewModel { EmployeeId = id });
+                    foreach (var id in selectedEmployee)
+                    {
+                        task.EmployeeTasks.Add(new EmployeeTasksViewModel { EmployeeId = id });
+                    }
+
+                    var taskDTO = _taskMapper.Map(task);
+                    _taskService.Edit(taskDTO);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogInformation(ex.Message, "Stopped program because of exception ");
+                    throw;
                 }
 
-                var taskDTO = _taskMapper.Map(task);
-                _taskService.Edit(taskDTO);
                 return RedirectToAction("Index");
             }
             else
@@ -230,13 +288,23 @@ namespace TrainingTask.Controllers
 
             if (id != null)
             {
-                var taskDTO = _taskService.GetById(id.Value);
-                if(taskDTO != null)
+                try
                 {
-                    var taskViewModel = _taskMapper.Map(taskDTO);
-                    return View(taskViewModel);
+                    var taskDTO = _taskService.GetById(id.Value);
+
+                    if (taskDTO != null)
+                    {
+                        var taskViewModel = _taskMapper.Map(taskDTO);
+                        return View(taskViewModel);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogInformation(ex.Message, "Stopped program because of exception ");
+                    throw;
                 }
             }
+
             return NotFound();
         }
 
@@ -251,7 +319,9 @@ namespace TrainingTask.Controllers
             catch(Exception ex)
             {
                 _logger.LogInformation(ex.Message, "Stopped program because of exception ");
+                throw;
             }
+
             return RedirectToAction("Index");
         }
 
@@ -261,11 +331,19 @@ namespace TrainingTask.Controllers
 
             if (id != null)
             {
-                var taskDTO = _taskService.GetById(id.Value);
-                if(taskDTO != null)
+                try
                 {
-                    var taskModelView = _taskMapper.Map(taskDTO);
-                    return View(taskModelView);
+                    var taskDTO = _taskService.GetById(id.Value);
+                    if (taskDTO != null)
+                    {
+                        var taskModelView = _taskMapper.Map(taskDTO);
+                        return View(taskModelView);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogInformation(ex.Message, "Stopped program because of exception ");
+                    throw;
                 }
             }
 
@@ -293,6 +371,7 @@ namespace TrainingTask.Controllers
         public IActionResult UploadToExcel()
         {
             IEnumerable<TaskDTO> tasksDTO;
+
             try
             {
                 tasksDTO = _taskService.GetAll();
