@@ -14,6 +14,7 @@ namespace TrainingTask.Models
         public string Surname { get; set; }
         [Required]
         public string Name { get; set; }
+        [Required]
         public string SecondName { get; set; }
         [Required]
         public string Position { get; set; }

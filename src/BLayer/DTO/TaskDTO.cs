@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
 using System.Xml.Serialization;
 
 namespace BLayer.DTO
@@ -16,6 +17,7 @@ namespace BLayer.DTO
         public DateTime DateOfEnd { get; set; }
         public Status TypeStatus { get; set; }
         public ProjectDTO Project { get; set; }
+        [IgnoreDataMember]
         public int ProjectId { get; set; }
         [NotMapped]
         public ICollection<EmployeeTasksDTO> EmployeeTasks { get; set; }
